@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Documents Vault — My Life Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple:       #5B3FA8;
+  --purple-mid:   #7B5FC8;
+  --purple-light: #EEEDFE;
+  --purple-soft:  #F4F2FF;
+  --green:        #2A6E4A;
+  --green-light:  #E8F5EF;
+  --amber:        #B06820;
+  --amber-light:  #FEF3E2;
+  --red:          #8B2E2E;
+  --red-light:    #FDEAEA;
+  --blue:         #1A4F8A;
+  --blue-light:   #E6F0FB;
+  --teal:         #0F6E56;
+  --teal-light:   #E1F5EE;
+  --gray-50:      #FAFAF9;
+  --gray-100:     #F4F3F0;
+  --gray-200:     #E5E4DF;
+  --gray-300:     #CECDC8;
+  --gray-400:     #9B9A94;
+  --gray-600:     #5C5B57;
+  --gray-800:     #2C2C2A;
+  --white:        #FFFFFF;
+  --radius:       10px;
+  --radius-lg:    14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh}
+
+.topbar{background:var(--purple);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.hub-label{font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);letter-spacing:0.08em;text-transform:uppercase}
+.page-title{font-size:18px;font-weight:600;color:#fff;letter-spacing:-0.01em}
+.save-dot{font-size:11px;color:rgba(255,255,255,0.45);font-family:'DM Mono',monospace;transition:color 0.3s}
+.save-dot.saved{color:#6EE7A8}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.search-wrap{display:flex;align-items:center;background:rgba(255,255,255,0.15);border-radius:20px;padding:5px 14px;gap:6px}
+.search-inp{background:none;border:none;outline:none;color:#fff;font-size:12px;font-family:'DM Sans',sans-serif;width:160px}
+.search-inp::placeholder{color:rgba(255,255,255,0.5)}
+
+.page{max-width:1120px;margin:0 auto;padding:22px 22px 48px}
+
+/* home info banner */
+.home-banner{background:var(--white);border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.home-field{display:flex;flex-direction:column;gap:3px}
+.home-field-lbl{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400)}
+.home-field-inp{border:none;outline:none;background:transparent;font-size:13px;color:var(--gray-800);font-family:'DM Sans',sans-serif;border-bottom:0.5px solid var(--gray-200);padding-bottom:3px}
+.home-field-inp::placeholder{color:var(--gray-300);font-style:italic}
+.home-field-inp.mono{font-family:'DM Mono',monospace}
+
+/* stat strip */
+.stat-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--white);border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:13px 16px}
+.stat-lbl{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:5px}
+.stat-val{font-size:22px;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:-0.02em}
+.stat-sub{font-size:11px;color:var(--gray-400);margin-top:3px}
+.bar-wrap{height:4px;background:var(--gray-100);border-radius:2px;margin-top:8px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;transition:width 0.5s}
+
+/* tabs */
+.tabs{display:flex;gap:2px;background:var(--gray-100);border-radius:var(--radius);padding:3px;margin-bottom:16px;flex-wrap:wrap;width:fit-content}
+.tab{padding:7px 15px;border-radius:8px;font-size:13px;font-weight:500;color:var(--gray-600);cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;transition:all 0.15s;white-space:nowrap}
+.tab.active{background:var(--white);color:var(--gray-800);box-shadow:0 0 0 0.5px var(--gray-200)}
+
+/* section cards */
+.scard{background:var(--white);border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:14px}
+.shead{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:0.5px solid var(--gray-100)}
+.shead-left{display:flex;align-items:center;gap:8px}
+.sicon{font-size:15px}
+.stitle{font-size:13px;font-weight:600;color:var(--gray-800)}
+.ssub{font-size:11px;color:var(--gray-400);margin-left:4px}
+.add-btn{font-size:12px;font-weight:500;color:var(--purple);background:var(--purple-light);border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s}
+.add-btn:hover{background:#DDDAFC}
+
+/* doc rows */
+.doc-row{display:grid;align-items:center;padding:9px 16px;border-bottom:0.5px solid var(--gray-50);gap:8px;transition:background 0.1s}
+.doc-row:last-child{border-bottom:none}
+.doc-row:hover{background:var(--gray-50)}
+.di{border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--gray-800);width:100%}
+.di::placeholder{color:var(--gray-300);font-style:italic}
+.di.mono{font-family:'DM Mono',monospace;font-size:12px}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--gray-300);font-size:13px;transition:color 0.15s;line-height:1;flex-shrink:0}
+.del-btn:hover{color:var(--red)}
+.status-badge{font-size:10px;font-weight:500;padding:3px 8px;border-radius:6px;white-space:nowrap;border:none;cursor:pointer;font-family:'DM Sans',sans-serif}
+.s-have{background:#E8F5EF;color:#1A5C38}
+.s-need{background:#FDEAEA;color:#8B2E2E}
+.s-digital{background:#E6F0FB;color:#0C447C}
+.s-na{background:#F1EFE8;color:#5F5E5A}
+.exp-ok{background:#E8F5EF;color:#1A5C38}
+.exp-soon{background:#FAEEDA;color:#633806}
+.exp-past{background:#FDEAEA;color:#8B2E2E}
+.exp-none{background:var(--gray-100);color:var(--gray-400)}
+.loc-pill{font-size:10px;font-weight:500;padding:2px 7px;border-radius:5px;background:#EEEDFE;color:#3C3489;white-space:nowrap}
+
+/* warranty cards */
+.warranty-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;padding:14px}
+.wcard{border:0.5px solid var(--gray-200);border-radius:var(--radius);overflow:hidden}
+.wcard-head{padding:9px 12px;background:var(--gray-50);border-bottom:0.5px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;gap:6px}
+.wcard-name{border:none;outline:none;background:transparent;font-size:13px;font-weight:500;color:var(--gray-800);font-family:'DM Sans',sans-serif;flex:1}
+.wcard-body{padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.wf{display:flex;flex-direction:column;gap:2px}
+.wf-lbl{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)}
+.wf-inp{border:none;outline:none;background:transparent;font-size:12px;color:var(--gray-800);font-family:'DM Sans',sans-serif;border-bottom:0.5px solid var(--gray-200);padding-bottom:2px}
+.wf-inp::placeholder{color:var(--gray-300)}
+
+/* utility cards */
+.util-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.util-card{background:var(--white);border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden}
+.util-head{padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:0.5px solid var(--gray-100)}
+.util-icon{font-size:18px}
+.util-name-inp{border:none;outline:none;background:transparent;font-size:13px;font-weight:600;color:var(--gray-800);font-family:'DM Sans',sans-serif;flex:1}
+.util-body{padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.uf{display:flex;flex-direction:column;gap:2px}
+.uf-lbl{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)}
+.uf-inp{border:none;outline:none;background:transparent;font-size:12px;color:var(--gray-800);font-family:'DM Sans',sans-serif;border-bottom:0.5px solid var(--gray-200);padding-bottom:2px;width:100%}
+.uf-inp::placeholder{color:var(--gray-300)}
+.uf-inp.mono{font-family:'DM Mono',monospace}
+
+/* two col */
+.two-col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.note-area{width:100%;border:none;outline:none;resize:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--gray-800);padding:12px 16px;background:transparent;min-height:80px}
+.note-area::placeholder{color:var(--gray-400);font-style:italic}
+.empty{text-align:center;padding:28px 16px;color:var(--gray-400);font-size:13px;font-style:italic}
+
+/* search highlight */
+.hl{background:#FFF3CD;border-radius:2px}
+
+@media(max-width:720px){.two-col,.stat-row,.util-grid,.warranty-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="hub-label">My Life Hub</div>
+    <div class="page-title">Home Documents Vault</div>
+  </div>
+  <div class="topbar-right">
+    <div class="search-wrap">
+      <span style="font-size:13px;color:rgba(255,255,255,0.6)">🔍</span>
+      <input class="search-inp" id="searchInp" placeholder="Search all docs..." oninput="doSearch()">
+    </div>
+    <span class="save-dot" id="saveDot">auto-saving</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Home Info Banner -->
+  <div class="home-banner" id="homeBanner">
+    <div class="home-field"><div class="home-field-lbl">Property Address</div><input class="home-field-inp" id="hAddr" placeholder="123 Main St, Chicago IL 60601"></div>
+    <div class="home-field"><div class="home-field-lbl">Purchase Price</div><input class="home-field-inp mono" id="hPrice" placeholder="$000,000"></div>
+    <div class="home-field"><div class="home-field-lbl">Closing Date</div><input class="home-field-inp mono" id="hClose" placeholder="MM/DD/YYYY" type="date"></div>
+    <div class="home-field"><div class="home-field-lbl">Loan Number</div><input class="home-field-inp mono" id="hLoan" placeholder="Loan #"></div>
+    <div class="home-field"><div class="home-field-lbl">Lender</div><input class="home-field-inp" id="hLender" placeholder="Bank name"></div>
+    <div class="home-field"><div class="home-field-lbl">Insurance Policy #</div><input class="home-field-inp mono" id="hInsPolicy" placeholder="Policy #"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-lbl">Documents logged</div>
+      <div class="stat-val" id="statDocs" style="color:var(--purple)">0</div>
+      <div class="stat-sub" id="statHave">0 in hand</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Warranties tracked</div>
+      <div class="stat-val" id="statWarr" style="color:var(--blue)">0</div>
+      <div class="stat-sub" id="statWarrActive">0 active</div>
+      <div class="bar-wrap"><div class="bar-fill" id="warrBar" style="width:0%;background:var(--green)"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Utilities set up</div>
+      <div class="stat-val" id="statUtil" style="color:var(--teal)">0</div>
+      <div class="stat-sub">accounts logged</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Still needed</div>
+      <div class="stat-val" id="statNeed" style="color:var(--red)">0</div>
+      <div class="stat-sub">docs marked "Need"</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('closing')">Closing Docs</button>
+    <button class="tab" onclick="showTab('mortgage')">Mortgage & Insurance</button>
+    <button class="tab" onclick="showTab('warranties')">Warranties</button>
+    <button class="tab" onclick="showTab('utilities')">Utilities</button>
+    <button class="tab" onclick="showTab('hoa')">HOA</button>
+    <button class="tab" onclick="showTab('notes')">Important Notes</button>
+  </div>
+
+  <!-- CLOSING DOCS -->
+  <div id="tab-closing">
+    <div class="scard">
+      <div class="shead">
+        <div class="shead-left"><span class="sicon">📋</span><span class="stitle">Closing Documents</span><span class="ssub">everything from purchase to close</span></div>
+        <button class="add-btn" onclick="addDoc('closing')">+ Add doc</button>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 100px 100px 28px;gap:8px;padding:7px 16px;border-bottom:0.5px solid var(--gray-100);background:var(--gray-50)">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Document</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Where stored</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Date</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Status</div>
+        <div></div>
+      </div>
+      <div id="closingList"></div>
+    </div>
+  </div>
+
+  <!-- MORTGAGE & INSURANCE -->
+  <div id="tab-mortgage" style="display:none">
+    <div class="two-col">
+      <div class="scard">
+        <div class="shead"><div class="shead-left"><span class="sicon">🏦</span><span class="stitle">Mortgage Details</span></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0" id="mortgageFields">
+          <div style="padding:10px 16px;border-right:0.5px solid var(--gray-100);border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Lender</div><input class="di" id="mLender" placeholder="Bank name..."></div>
+          <div style="padding:10px 16px;border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Loan number</div><input class="di mono" id="mLoanNum" placeholder="Loan #..."></div>
+          <div style="padding:10px 16px;border-right:0.5px solid var(--gray-100);border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Loan type</div><input class="di" id="mType" placeholder="e.g. 30yr fixed, FHA..."></div>
+          <div style="padding:10px 16px;border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Interest rate</div><input class="di mono" id="mRate" placeholder="e.g. 6.75%"></div>
+          <div style="padding:10px 16px;border-right:0.5px solid var(--gray-100);border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Monthly payment</div><input class="di mono" id="mPayment" placeholder="$0,000"></div>
+          <div style="padding:10px 16px;border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Due date</div><input class="di" id="mDue" placeholder="e.g. 1st of month"></div>
+          <div style="padding:10px 16px;border-right:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Servicer phone</div><input class="di mono" id="mPhone" placeholder="(555) 555-5555"></div>
+          <div style="padding:10px 16px"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Online portal</div><input class="di" id="mPortal" placeholder="website URL..."></div>
+        </div>
+      </div>
+      <div>
+        <div class="scard" style="margin-bottom:14px">
+          <div class="shead"><div class="shead-left"><span class="sicon">🛡️</span><span class="stitle">Homeowner's Insurance</span></div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+            <div style="padding:10px 16px;border-right:0.5px solid var(--gray-100);border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Provider</div><input class="di" id="insProvider" placeholder="e.g. State Farm..."></div>
+            <div style="padding:10px 16px;border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Policy number</div><input class="di mono" id="insPolicy" placeholder="Policy #"></div>
+            <div style="padding:10px 16px;border-right:0.5px solid var(--gray-100);border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Agent name</div><input class="di" id="insAgent" placeholder="Agent name"></div>
+            <div style="padding:10px 16px;border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Agent phone</div><input class="di mono" id="insPhone" placeholder="(555) 555-5555"></div>
+            <div style="padding:10px 16px;border-right:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Annual premium</div><input class="di mono" id="insPremium" placeholder="$0,000/yr"></div>
+            <div style="padding:10px 16px"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Renewal date</div><input class="di" id="insRenewal" type="date"></div>
+          </div>
+        </div>
+        <div class="scard">
+          <div class="shead"><div class="shead-left"><span class="sicon">📄</span><span class="stitle">Mortgage & Insurance Docs</span></div><button class="add-btn" onclick="addDoc('mortgage')">+ Add doc</button></div>
+          <div id="mortgageList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WARRANTIES -->
+  <div id="tab-warranties" style="display:none">
+    <div class="scard">
+      <div class="shead"><div class="shead-left"><span class="sicon">🛡️</span><span class="stitle">Warranties & Manuals</span><span class="ssub">appliances, systems, materials</span></div><button class="add-btn" onclick="addWarranty()">+ Add warranty</button></div>
+      <div class="warranty-grid" id="warrantyGrid"></div>
+    </div>
+  </div>
+
+  <!-- UTILITIES -->
+  <div id="tab-utilities" style="display:none">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="add-btn" onclick="addUtility()">+ Add utility</button></div>
+    <div class="util-grid" id="utilGrid"></div>
+  </div>
+
+  <!-- HOA -->
+  <div id="tab-hoa" style="display:none">
+    <div class="two-col">
+      <div class="scard">
+        <div class="shead"><div class="shead-left"><span class="sicon">🏘️</span><span class="stitle">HOA Information</span></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+          <div style="padding:10px 16px;border-right:0.5px solid var(--gray-100);border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">HOA Name</div><input class="di" id="hoaName" placeholder="Association name..."></div>
+          <div style="padding:10px 16px;border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Monthly fee</div><input class="di mono" id="hoaFee" placeholder="$0/mo"></div>
+          <div style="padding:10px 16px;border-right:0.5px solid var(--gray-100);border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Management company</div><input class="di" id="hoaMgmt" placeholder="Company name..."></div>
+          <div style="padding:10px 16px;border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Contact phone</div><input class="di mono" id="hoaPhone" placeholder="(555) 555-5555"></div>
+          <div style="padding:10px 16px;border-right:0.5px solid var(--gray-100);border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Contact email</div><input class="di" id="hoaEmail" placeholder="email@hoa.com"></div>
+          <div style="padding:10px 16px;border-bottom:0.5px solid var(--gray-100)"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Meeting schedule</div><input class="di" id="hoaMeetings" placeholder="e.g. 1st Tuesday monthly"></div>
+          <div style="padding:10px 16px;grid-column:span 2"><div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:4px">Portal / website</div><input class="di" id="hoaPortal" placeholder="Website URL..." style="width:100%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="scard" style="margin-bottom:14px">
+          <div class="shead"><div class="shead-left"><span class="sicon">📋</span><span class="stitle">HOA Rules & Notes</span></div></div>
+          <textarea class="note-area" id="hoaRules" placeholder="Key rules, restrictions, pet policy, parking rules, renovation approval process..."></textarea>
+        </div>
+        <div class="scard">
+          <div class="shead"><div class="shead-left"><span class="sicon">📄</span><span class="stitle">HOA Documents</span></div><button class="add-btn" onclick="addDoc('hoa')">+ Add doc</button></div>
+          <div id="hoaList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div id="tab-notes" style="display:none">
+    <div class="two-col">
+      <div class="scard">
+        <div class="shead"><div class="shead-left"><span class="sicon">🔑</span><span class="stitle">Important Numbers & Codes</span></div></div>
+        <textarea class="note-area" id="noteCodes" placeholder="Garage code: &#10;Alarm code: &#10;Gate code: &#10;Safe combination: &#10;WiFi password: &#10;Security system PIN: " style="min-height:160px"></textarea>
+      </div>
+      <div class="scard">
+        <div class="shead"><div class="shead-left"><span class="sicon">🚨</span><span class="stitle">Emergency Shutoffs</span></div></div>
+        <textarea class="note-area" id="noteShutoffs" placeholder="Main water shutoff: (location)&#10;Gas shutoff: (location)&#10;Electrical panel: (location)&#10;Circuit breaker labels: &#10;Sump pump: (location)" style="min-height:160px"></textarea>
+      </div>
+    </div>
+    <div class="scard" style="margin-top:0">
+      <div class="shead"><div class="shead-left"><span class="sicon">📝</span><span class="stitle">General Notes</span></div></div>
+      <textarea class="note-area" id="noteGeneral" placeholder="Anything else important about the property — known issues, quirks, what the sellers told you, neighborhood notes..." style="min-height:100px"></textarea>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+  /* ── SUPABASE CLOUD SYNC ────────────────────────────────────────────── */
+  const _SB_URL = "https://hlnkoytccsycwvhsdguz.supabase.co";
+  const _SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhsbmtveXRjY3N5Y3d2aHNkZ3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2Nzk2ODksImV4cCI6MjA5MzI1NTY4OX0.YQEMSqtojDexB5We4gINHo9CxwR1hGHqRCZ-3kMSwJs";
+  const _SB_HDR = { apikey: _SB_KEY, Authorization: "Bearer " + _SB_KEY, "Content-Type": "application/json" };
+
+  async function cloudLoad(table) {
+    try {
+      const r = await fetch(`${_SB_URL}/rest/v1/${table}?id=eq.main&select=data`, { headers: _SB_HDR });
+      const rows = await r.json();
+      if (rows && rows[0] && rows[0].data && Object.keys(rows[0].data).length > 0) return rows[0].data;
+    } catch(e) { console.warn("Cloud load failed:", e); }
+    return null;
+  }
+
+  async function cloudSave(table, data) {
+    try {
+      await fetch(`${_SB_URL}/rest/v1/${table}`, {
+        method: "POST",
+        headers: { ..._SB_HDR, Prefer: "resolution=merge-duplicates" },
+        body: JSON.stringify({ id: "main", data, updated_at: new Date().toISOString() })
+      });
+    } catch(e) { console.warn("Cloud save failed:", e); }
+  }
+  /* ── END SUPABASE ──────────────────────────────────────────────────── */
+const KEY = 'mylifehub_vault_v1';
+
+const DEFAULT_CLOSING_DOCS = [
+  'Purchase & Sale Agreement','Inspection Report','Appraisal Report',
+  'Closing Disclosure (CD)','Settlement Statement (HUD-1)','Deed of Trust / Mortgage',
+  'Title Insurance Policy','Survey','Property Tax Records',
+  'Home Warranty (if applicable)','Final Walkthrough Notes',
+];
+const DOC_STATUSES = ['Have it','Need it','Digital only','N/A'];
+const STATUS_CLS_MAP = {'Have it':'s-have','Need it':'s-need','Digital only':'s-digital','N/A':'s-na'};
+
+const DEFAULT_UTILITIES = [
+  {name:'Electric',icon:'⚡'},{name:'Gas',icon:'🔥'},{name:'Water / Sewer',icon:'💧'},
+  {name:'Internet',icon:'📶'},{name:'Trash / Recycling',icon:'🗑️'},{name:'Cable / TV',icon:'📺'},
+];
+const DEFAULT_WARRANTIES = [
+  {name:'Roof'},{name:'HVAC / Furnace'},{name:'Water Heater'},{name:'Refrigerator'},
+  {name:'Washer / Dryer'},{name:'Dishwasher'},{name:'Garage Door'},
+];
+
+let state;
+
+async function load(){
+  const cloud = await cloudLoad('vault');
+  if (cloud) { state = cloud; return; }
+  try{ state=JSON.parse(localStorage.getItem(KEY))||{} }catch(e){ state={} }
+  if(!state.home) state.home={addr:'',price:'',close:'',loan:'',lender:'',insPolicy:''};
+  if(!state.docs) state.docs={closing:[],mortgage:[],hoa:[]};
+  if(!state.mortgage) state.mortgage={lender:'',loanNum:'',type:'',rate:'',payment:'',due:'',phone:'',portal:''};
+  if(!state.insurance) state.insurance={provider:'',policy:'',agent:'',phone:'',premium:'',renewal:''};
+  if(!state.warranties) state.warranties=DEFAULT_WARRANTIES.map((w,i)=>({id:i,name:w.name,expires:'',brand:'',model:'',location:'',notes:''}));
+  if(!state.utilities) state.utilities=DEFAULT_UTILITIES.map((u,i)=>({id:i,name:u.name,icon:u.icon,provider:'',acct:'',phone:'',website:'',autopay:false,monthly:'',setup:false}));
+  if(!state.hoa) state.hoa={name:'',fee:'',mgmt:'',phone:'',email:'',meetings:'',portal:'',rules:''};
+  if(!state.notes) state.notes={codes:'',shutoffs:'',general:''};
+
+  // seed default closing docs if empty
+  if(!state.docs.closing.length){
+    state.docs.closing=DEFAULT_CLOSING_DOCS.map((name,i)=>({id:i,name,location:'',date:'',status:'Need it'}));
+  }
+}
+
+let saveTimer;
+function save(){
+  clearTimeout(saveTimer);
+  const dot=document.getElementById('saveDot');
+  dot.textContent='saving...'; dot.classList.remove('saved');
+  saveTimer=setTimeout(()=>{
+    localStorage.setItem(KEY,JSON.stringify(state));
+    cloudSave('vault', state);
+    dot.textContent='saved'; dot.classList.add('saved');
+    setTimeout(()=>{ dot.textContent='auto-saving' },1800);
+  },500);
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+
+/* ── HOME BANNER ── */
+function loadBanner(){
+  document.getElementById('hAddr').value=state.home.addr||'';
+  document.getElementById('hPrice').value=state.home.price||'';
+  document.getElementById('hClose').value=state.home.close||'';
+  document.getElementById('hLoan').value=state.home.loan||'';
+  document.getElementById('hLender').value=state.home.lender||'';
+  document.getElementById('hInsPolicy').value=state.home.insPolicy||'';
+}
+function wireBanner(){
+  const map={hAddr:'addr',hPrice:'price',hClose:'close',hLoan:'loan',hLender:'lender',hInsPolicy:'insPolicy'};
+  Object.entries(map).forEach(([id,key])=>{
+    document.getElementById(id).addEventListener('input',e=>{state.home[key]=e.target.value;save()});
+  });
+}
+
+/* ── TABS ── */
+const ALL_TABS=['closing','mortgage','warranties','utilities','hoa','notes'];
+function showTab(id){
+  ALL_TABS.forEach(t=>{ document.getElementById('tab-'+t).style.display=t===id?'block':'none' });
+  document.querySelectorAll('.tab').forEach((b,i)=>{ b.classList.toggle('active',ALL_TABS[i]===id) });
+  if(id==='closing') renderDocs('closing');
+  if(id==='mortgage'){ loadMortgage(); renderDocs('mortgage'); }
+  if(id==='warranties') renderWarranties();
+  if(id==='utilities') renderUtilities();
+  if(id==='hoa'){ loadHoa(); renderDocs('hoa'); }
+  if(id==='notes') loadNotes();
+  updateStats();
+}
+
+/* ── DOCS ── */
+function addDoc(section){
+  state.docs[section].push({id:Date.now()+Math.random(),name:'',location:'',date:'',status:'Need it'});
+  save();
+  renderDocs(section);
+}
+const STATUS_ORDER={'Have it':0,'Digital only':1,'Need it':2,'N/A':3};
+function nextStatus(s){
+  const order=['Have it','Digital only','Need it','N/A'];
+  return order[(order.indexOf(s)+1)%order.length];
+}
+
+function renderDocs(section){
+  const listId = section+'List';
+  const el=document.getElementById(listId);
+  if(!el) return;
+  el.innerHTML='';
+  const docs=state.docs[section]||[];
+  if(!docs.length){
+    el.innerHTML='<div class="empty">No documents logged yet</div>';
+    return;
+  }
+  docs.forEach((doc,i)=>{
+    const row=document.createElement('div');
+    row.className='doc-row';
+    row.style.gridTemplateColumns='2fr 1fr 100px 100px 28px';
+    row.innerHTML=`
+      <input class="di" placeholder="Document name..." value="${esc(doc.name)}">
+      <input class="di" placeholder="Where stored? (e.g. Google Drive, filing cabinet...)" value="${esc(doc.location)}" style="font-size:12px;color:var(--gray-600)">
+      <input class="di mono" type="date" value="${esc(doc.date)}" style="font-size:11px;color:var(--gray-600)">
+      <button class="status-badge ${STATUS_CLS_MAP[doc.status]||'s-need'}">${doc.status}</button>
+      <button class="del-btn">✕</button>`;
+    row.querySelectorAll('input')[0].addEventListener('input',e=>{doc.name=e.target.value;save()});
+    row.querySelectorAll('input')[1].addEventListener('input',e=>{doc.location=e.target.value;save()});
+    row.querySelectorAll('input')[2].addEventListener('change',e=>{doc.date=e.target.value;save()});
+    row.querySelector('.status-badge').addEventListener('click',()=>{doc.status=nextStatus(doc.status);save();renderDocs(section);updateStats()});
+    row.querySelector('.del-btn').addEventListener('click',()=>{state.docs[section].splice(i,1);save();renderDocs(section);updateStats()});
+    el.appendChild(row);
+  });
+}
+
+/* ── MORTGAGE ── */
+function loadMortgage(){
+  const m=state.mortgage, ins=state.insurance;
+  Object.entries({mLender:'lender',mLoanNum:'loanNum',mType:'type',mRate:'rate',mPayment:'payment',mDue:'due',mPhone:'phone',mPortal:'portal'}).forEach(([id,k])=>{
+    const el=document.getElementById(id); if(el) el.value=m[k]||'';
+  });
+  Object.entries({insProvider:'provider',insPolicy:'policy',insAgent:'agent',insPhone:'phone',insPremium:'premium',insRenewal:'renewal'}).forEach(([id,k])=>{
+    const el=document.getElementById(id); if(el) el.value=ins[k]||'';
+  });
+  // wire
+  Object.entries({mLender:'lender',mLoanNum:'loanNum',mType:'type',mRate:'rate',mPayment:'payment',mDue:'due',mPhone:'phone',mPortal:'portal'}).forEach(([id,k])=>{
+    const el=document.getElementById(id);
+    if(el&&!el._wired){el._wired=true;el.addEventListener('input',e=>{state.mortgage[k]=e.target.value;save()})}
+  });
+  Object.entries({insProvider:'provider',insPolicy:'policy',insAgent:'agent',insPhone:'phone',insPremium:'premium',insRenewal:'renewal'}).forEach(([id,k])=>{
+    const el=document.getElementById(id);
+    if(el&&!el._wired){el._wired=true;el.addEventListener('input',e=>{state.insurance[k]=e.target.value;save()})}
+  });
+}
+
+/* ── WARRANTIES ── */
+function addWarranty(){
+  const name=prompt('Item name (e.g. Water Heater):','');
+  if(!name) return;
+  state.warranties.push({id:Date.now(),name,expires:'',brand:'',model:'',location:'',notes:''});
+  save(); renderWarranties();
+}
+function warrantyStatus(exp){
+  if(!exp) return {cls:'exp-none',label:'No date'};
+  const d=new Date(exp); const now=new Date(); now.setHours(0,0,0,0);
+  const days=Math.ceil((d-now)/(1000*60*60*24));
+  if(days<0) return {cls:'exp-past',label:'Expired'};
+  if(days<=90) return {cls:'exp-soon',label:`${days}d left`};
+  return {cls:'exp-ok',label:'Active'};
+}
+function renderWarranties(){
+  const grid=document.getElementById('warrantyGrid');
+  grid.innerHTML='';
+  if(!state.warranties.length){grid.innerHTML='<div class="empty" style="padding:24px">No warranties logged yet</div>';return}
+  state.warranties.forEach((w,i)=>{
+    const ws=warrantyStatus(w.expires);
+    const card=document.createElement('div');
+    card.className='wcard';
+    card.innerHTML=`
+      <div class="wcard-head">
+        <input class="wcard-name" value="${esc(w.name)}" placeholder="Item name">
+        <span class="status-badge ${ws.cls}" style="cursor:default">${ws.label}</span>
+        <button class="del-btn">✕</button>
+      </div>
+      <div class="wcard-body">
+        <div class="wf"><div class="wf-lbl">Brand</div><input class="wf-inp" placeholder="e.g. Carrier" value="${esc(w.brand)}"></div>
+        <div class="wf"><div class="wf-lbl">Model #</div><input class="wf-inp" placeholder="Model number" value="${esc(w.model)}"></div>
+        <div class="wf"><div class="wf-lbl">Warranty expires</div><input class="wf-inp" type="date" value="${esc(w.expires)}"></div>
+        <div class="wf"><div class="wf-lbl">Manual / doc location</div><input class="wf-inp" placeholder="Where is the manual?" value="${esc(w.location)}"></div>
+        <div class="wf" style="grid-column:span 2"><div class="wf-lbl">Notes</div><input class="wf-inp" placeholder="Serial #, purchase date, service history..." value="${esc(w.notes)}" style="width:100%"></div>
+      </div>`;
+    card.querySelector('.wcard-name').addEventListener('input',e=>{w.name=e.target.value;save()});
+    card.querySelector('.del-btn').addEventListener('click',()=>{state.warranties.splice(i,1);save();renderWarranties();updateStats()});
+    const inputs=card.querySelectorAll('.wf-inp');
+    ['brand','model','expires','location','notes'].forEach((f,fi)=>{
+      inputs[fi].addEventListener('input',e=>{w[f]=e.target.value;save();if(f==='expires') renderWarranties()});
+    });
+    grid.appendChild(card);
+  });
+  updateStats();
+}
+
+/* ── UTILITIES ── */
+function addUtility(){
+  const name=prompt('Utility name (e.g. Electric, Internet):','');
+  if(!name) return;
+  state.utilities.push({id:Date.now(),name,icon:'⚡',provider:'',acct:'',phone:'',website:'',autopay:false,monthly:'',setup:false});
+  save(); renderUtilities();
+}
+function renderUtilities(){
+  const grid=document.getElementById('utilGrid');
+  grid.innerHTML='';
+  state.utilities.forEach((u,i)=>{
+    const card=document.createElement('div');
+    card.className='util-card';
+    card.innerHTML=`
+      <div class="util-head">
+        <span class="util-icon">${u.icon}</span>
+        <input class="util-name-inp" value="${esc(u.name)}" placeholder="Utility name">
+        <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray-400);white-space:nowrap;cursor:pointer;margin-left:auto">
+          <input type="checkbox" ${u.setup?'checked':''} style="accent-color:var(--purple);width:13px;height:13px">Setup done
+        </label>
+        <button class="del-btn">✕</button>
+      </div>
+      <div class="util-body">
+        <div class="uf"><div class="uf-lbl">Provider</div><input class="uf-inp" placeholder="Company name..." value="${esc(u.provider)}"></div>
+        <div class="uf"><div class="uf-lbl">Account #</div><input class="uf-inp mono" placeholder="Account #" value="${esc(u.acct)}"></div>
+        <div class="uf"><div class="uf-lbl">Phone</div><input class="uf-inp mono" placeholder="(555) 555-5555" value="${esc(u.phone)}"></div>
+        <div class="uf"><div class="uf-lbl">Monthly est.</div><input class="uf-inp mono" placeholder="$0/mo" value="${esc(u.monthly)}"></div>
+        <div class="uf" style="grid-column:span 2">
+          <div class="uf-lbl">Website / portal</div>
+          <input class="uf-inp" placeholder="Website URL..." value="${esc(u.website)}" style="width:100%">
+        </div>
+        <div class="uf" style="grid-column:span 2;display:flex;align-items:center;gap:6px;padding-top:4px">
+          <input type="checkbox" ${u.autopay?'checked':''} style="accent-color:var(--purple);width:13px;height:13px">
+          <span style="font-size:12px;color:var(--gray-600)">Auto-pay enabled</span>
+        </div>
+      </div>`;
+    card.querySelector('.util-name-inp').addEventListener('input',e=>{u.name=e.target.value;save()});
+    card.querySelector('.del-btn').addEventListener('click',()=>{state.utilities.splice(i,1);save();renderUtilities();updateStats()});
+    const checkboxes=card.querySelectorAll('input[type=checkbox]');
+    checkboxes[0].addEventListener('change',e=>{u.setup=e.target.checked;save();updateStats()});
+    checkboxes[1].addEventListener('change',e=>{u.autopay=e.target.checked;save()});
+    const textInps=card.querySelectorAll('.uf-inp');
+    ['provider','acct','phone','monthly','website'].forEach((f,fi)=>{
+      textInps[fi].addEventListener('input',e=>{u[f]=e.target.value;save()});
+    });
+    grid.appendChild(card);
+  });
+  updateStats();
+}
+
+/* ── HOA ── */
+function loadHoa(){
+  const h=state.hoa;
+  const map={hoaName:'name',hoaFee:'fee',hoaMgmt:'mgmt',hoaPhone:'phone',hoaEmail:'email',hoaMeetings:'meetings',hoaPortal:'portal'};
+  Object.entries(map).forEach(([id,k])=>{ const el=document.getElementById(id);if(el) el.value=h[k]||'' });
+  document.getElementById('hoaRules').value=h.rules||'';
+  Object.entries(map).forEach(([id,k])=>{
+    const el=document.getElementById(id);
+    if(el&&!el._wired){el._wired=true;el.addEventListener('input',e=>{state.hoa[k]=e.target.value;save()})}
+  });
+  const rulesEl=document.getElementById('hoaRules');
+  if(!rulesEl._wired){rulesEl._wired=true;rulesEl.addEventListener('input',e=>{state.hoa.rules=e.target.value;save()})}
+}
+
+/* ── NOTES ── */
+function loadNotes(){
+  document.getElementById('noteCodes').value=state.notes.codes||'';
+  document.getElementById('noteShutoffs').value=state.notes.shutoffs||'';
+  document.getElementById('noteGeneral').value=state.notes.general||'';
+  ['noteCodes','noteShutoffs','noteGeneral'].forEach(id=>{
+    const el=document.getElementById(id);
+    const key=id.replace('note','').toLowerCase();
+    if(!el._wired){el._wired=true;el.addEventListener('input',e=>{state.notes[key]=e.target.value;save()})}
+  });
+}
+
+/* ── SEARCH ── */
+function doSearch(){
+  const q=document.getElementById('searchInp').value.toLowerCase().trim();
+  if(!q){showTab('closing');return}
+  // just highlight within current visible content — simple approach
+}
+
+/* ── STATS ── */
+function updateStats(){
+  const allDocs=[...state.docs.closing,...state.docs.mortgage,...state.docs.hoa];
+  const have=allDocs.filter(d=>d.status==='Have it'||d.status==='Digital only').length;
+  const need=allDocs.filter(d=>d.status==='Need it').length;
+
+  const activeWarr=state.warranties.filter(w=>{
+    if(!w.expires) return false;
+    return new Date(w.expires)>new Date();
+  }).length;
+
+  const utilSetup=state.utilities.filter(u=>u.setup).length;
+
+  document.getElementById('statDocs').textContent=allDocs.length;
+  document.getElementById('statHave').textContent=`${have} in hand or digital`;
+  document.getElementById('statWarr').textContent=state.warranties.length;
+  document.getElementById('statWarrActive').textContent=`${activeWarr} active`;
+  const warrPct=state.warranties.length?Math.round(activeWarr/state.warranties.length*100):0;
+  document.getElementById('warrBar').style.width=warrPct+'%';
+  document.getElementById('statUtil').textContent=`${utilSetup}/${state.utilities.length}`;
+  document.getElementById('statNeed').textContent=need;
+}
+
+/* ── INIT ── */
+load();
+loadBanner();
+wireBanner();
+renderDocs('closing');
+updateStats();
+</script>
+</body>
+</html>

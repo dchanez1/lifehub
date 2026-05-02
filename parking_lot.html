@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parking Lot & Ideas — My Life Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple:       #5B3FA8;
+  --purple-mid:   #7B5FC8;
+  --purple-light: #EEEDFE;
+  --purple-soft:  #F4F2FF;
+  --green:        #2A6E4A;
+  --green-light:  #E8F5EF;
+  --amber:        #B06820;
+  --amber-light:  #FEF3E2;
+  --red:          #8B2E2E;
+  --red-light:    #FDEAEA;
+  --blue:         #1A4F8A;
+  --blue-light:   #E6F0FB;
+  --teal:         #0F6E56;
+  --teal-light:   #E1F5EE;
+  --pink:         #8B2E5E;
+  --pink-light:   #FDEAF3;
+  --gray-50:      #FAFAF9;
+  --gray-100:     #F4F3F0;
+  --gray-200:     #E5E4DF;
+  --gray-300:     #CECDC8;
+  --gray-400:     #9B9A94;
+  --gray-600:     #5C5B57;
+  --gray-800:     #2C2C2A;
+  --white:        #FFFFFF;
+  --radius:       10px;
+  --radius-lg:    14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh}
+
+/* topbar */
+.topbar{background:var(--purple);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hub-label{font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);letter-spacing:0.08em;text-transform:uppercase}
+.page-title{font-size:18px;font-weight:600;color:#fff;letter-spacing:-0.01em}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.save-dot{font-size:11px;color:rgba(255,255,255,0.45);font-family:'DM Mono',monospace;transition:color 0.3s}
+.save-dot.saved{color:#6EE7A8}
+.search-wrap{display:flex;align-items:center;background:rgba(255,255,255,0.15);border-radius:20px;padding:5px 14px;gap:6px}
+.search-inp{background:none;border:none;outline:none;color:#fff;font-size:12px;font-family:'DM Sans',sans-serif;width:140px}
+.search-inp::placeholder{color:rgba(255,255,255,0.45)}
+
+/* layout */
+.page{max-width:1120px;margin:0 auto;padding:22px 22px 48px}
+
+/* stat strip */
+.stat-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--white);border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:13px 16px}
+.stat-lbl{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:5px}
+.stat-val{font-size:22px;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:-0.02em}
+.stat-sub{font-size:11px;color:var(--gray-400);margin-top:3px}
+
+/* tabs */
+.tabs{display:flex;gap:2px;background:var(--gray-100);border-radius:var(--radius);padding:3px;margin-bottom:16px;flex-wrap:wrap;width:fit-content}
+.tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;color:var(--gray-600);cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;transition:all 0.15s;white-space:nowrap}
+.tab.active{background:var(--white);color:var(--gray-800);box-shadow:0 0 0 0.5px var(--gray-200)}
+
+/* quick capture bar */
+.capture-bar{background:var(--white);border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.capture-inp{flex:1;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--gray-800)}
+.capture-inp::placeholder{color:var(--gray-400);font-style:italic}
+.capture-cat{border:none;outline:none;background:var(--gray-100);border-radius:6px;padding:6px 10px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--gray-600);cursor:pointer}
+.capture-btn{background:var(--purple);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s;white-space:nowrap}
+.capture-btn:hover{background:var(--purple-mid)}
+
+/* section cards */
+.scard{background:var(--white);border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:14px}
+.shead{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:0.5px solid var(--gray-100)}
+.shead-left{display:flex;align-items:center;gap:8px}
+.sicon{font-size:15px}
+.stitle{font-size:13px;font-weight:600;color:var(--gray-800)}
+.ssub{font-size:11px;color:var(--gray-400);margin-left:4px}
+.add-btn{font-size:12px;font-weight:500;color:var(--purple);background:var(--purple-light);border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s}
+.add-btn:hover{background:#DDDAFC}
+
+/* idea cards grid */
+.ideas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;padding:14px}
+.idea-card{border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;transition:border-color 0.15s}
+.idea-card:hover{border-color:var(--gray-300)}
+.idea-card-head{padding:10px 12px 8px;display:flex;align-items:flex-start;gap:8px}
+.idea-cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.idea-title-inp{border:none;outline:none;background:transparent;font-size:13px;font-weight:500;color:var(--gray-800);font-family:'DM Sans',sans-serif;flex:1;line-height:1.4}
+.idea-title-inp::placeholder{color:var(--gray-400);font-style:italic}
+.idea-notes-inp{width:100%;border:none;outline:none;background:transparent;font-size:12px;color:var(--gray-600);font-family:'DM Sans',sans-serif;padding:0 12px 8px 28px;resize:none;min-height:40px;line-height:1.5}
+.idea-notes-inp::placeholder{color:var(--gray-300);font-style:italic}
+.idea-foot{padding:7px 12px;border-top:0.5px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;gap:6px}
+.idea-cat-sel{border:none;outline:none;background:transparent;font-size:10px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;color:var(--gray-600)}
+.idea-actions{display:flex;align-items:center;gap:6px}
+.promote-btn{font-size:10px;font-weight:500;padding:3px 8px;border-radius:5px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif}
+.star-btn{background:none;border:none;cursor:pointer;font-size:14px;padding:0;line-height:1;opacity:0.5;transition:opacity 0.15s}
+.star-btn.starred{opacity:1}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--gray-300);font-size:13px;transition:color 0.15s;line-height:1}
+.del-btn:hover{color:var(--red)}
+
+/* wishlist rows */
+.wish-row{display:grid;align-items:center;padding:9px 16px;border-bottom:0.5px solid var(--gray-50);gap:8px;transition:background 0.1s}
+.wish-row:last-child{border-bottom:none}
+.wish-row:hover{background:var(--gray-50)}
+.wi{border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--gray-800);width:100%}
+.wi::placeholder{color:var(--gray-300);font-style:italic}
+.wi.mono{font-family:'DM Mono',monospace;font-size:12px}
+.pri-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:5px;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.pri-high{background:var(--red-light);color:var(--red)}
+.pri-med{background:var(--amber-light);color:var(--amber)}
+.pri-low{background:var(--green-light);color:var(--green)}
+.pri-none{background:var(--gray-100);color:var(--gray-400)}
+
+/* research rows */
+.research-row{display:grid;align-items:center;padding:9px 16px;border-bottom:0.5px solid var(--gray-50);gap:8px;transition:background 0.1s}
+.research-row:last-child{border-bottom:none}
+.research-row:hover{background:var(--gray-50)}
+.status-chip{font-size:10px;font-weight:500;padding:3px 8px;border-radius:6px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.chip-toread{background:var(--blue-light);color:var(--blue)}
+.chip-inprog{background:var(--amber-light);color:var(--amber)}
+.chip-done{background:var(--green-light);color:var(--green)}
+
+/* someday rows */
+.someday-row{display:grid;align-items:start;padding:10px 16px;border-bottom:0.5px solid var(--gray-50);gap:8px}
+.someday-row:last-child{border-bottom:none}
+.sd-title{border:none;outline:none;background:transparent;font-size:13px;font-weight:500;color:var(--gray-800);font-family:'DM Sans',sans-serif;width:100%}
+.sd-title::placeholder{color:var(--gray-300);font-style:italic}
+.sd-why{border:none;outline:none;background:transparent;font-size:12px;color:var(--gray-600);font-family:'DM Sans',sans-serif;width:100%}
+.sd-why::placeholder{color:var(--gray-300);font-style:italic}
+.horizon-sel{border:none;outline:none;background:var(--gray-100);border-radius:6px;padding:3px 8px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;color:var(--gray-600)}
+
+/* empty */
+.empty{text-align:center;padding:32px 16px;color:var(--gray-400);font-size:13px;font-style:italic}
+
+/* search highlight */
+.hidden-by-search{display:none!important}
+
+@media(max-width:680px){.stat-row,.ideas-grid{grid-template-columns:1fr}.capture-bar{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="hub-label">My Life Hub</div>
+    <div class="page-title">Parking Lot & Ideas</div>
+  </div>
+  <div class="topbar-right">
+    <div class="search-wrap">
+      <span style="font-size:13px;color:rgba(255,255,255,0.6)">🔍</span>
+      <input class="search-inp" id="searchInp" placeholder="Search ideas..." oninput="doSearch()">
+    </div>
+    <span class="save-dot" id="saveDot">auto-saving</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Stats -->
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-lbl">Total ideas</div>
+      <div class="stat-val" id="statIdeas" style="color:var(--purple)">0</div>
+      <div class="stat-sub" id="statStarred">0 starred</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Wishlist items</div>
+      <div class="stat-val" id="statWish" style="color:var(--amber)">0</div>
+      <div class="stat-sub" id="statWishEst">$0 estimated</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Things to research</div>
+      <div class="stat-val" id="statResearch" style="color:var(--blue)">0</div>
+      <div class="stat-sub" id="statResearchDone">0 done</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Someday / maybe</div>
+      <div class="stat-val" id="statSomeday" style="color:var(--teal)">0</div>
+      <div class="stat-sub">big dreams & goals</div>
+    </div>
+  </div>
+
+  <!-- Quick capture -->
+  <div class="capture-bar">
+    <span style="font-size:18px">💡</span>
+    <input class="capture-inp" id="captureInp" placeholder="Quick capture — type any idea and hit Add..." onkeydown="if(event.key==='Enter')quickCapture()">
+    <select class="capture-cat" id="captureCat">
+      <option value="home">🏠 Home idea</option>
+      <option value="personal">✨ Personal</option>
+      <option value="reno">🔨 Renovation</option>
+      <option value="garden">🌿 Garden</option>
+      <option value="decor">🎨 Decor</option>
+      <option value="tech">💻 Tech</option>
+      <option value="other">💬 Other</option>
+    </select>
+    <button class="capture-btn" onclick="quickCapture()">Add to Parking Lot</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('ideas')">💡 Ideas Board</button>
+    <button class="tab" onclick="showTab('wishlist')">⭐ Wishlist</button>
+    <button class="tab" onclick="showTab('research')">🔎 To Research</button>
+    <button class="tab" onclick="showTab('someday')">🌅 Someday / Maybe</button>
+  </div>
+
+  <!-- IDEAS BOARD -->
+  <div id="tab-ideas">
+    <div class="scard">
+      <div class="shead">
+        <div class="shead-left">
+          <span class="sicon">💡</span>
+          <span class="stitle">Ideas Board</span>
+          <span class="ssub">all your parking lot ideas — review monthly</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="filterCat" onchange="renderIdeas()" style="border:0.5px solid var(--gray-200);border-radius:6px;padding:4px 10px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--gray-600);background:var(--white);cursor:pointer;outline:none">
+            <option value="all">All categories</option>
+            <option value="home">🏠 Home</option>
+            <option value="reno">🔨 Renovation</option>
+            <option value="garden">🌿 Garden</option>
+            <option value="decor">🎨 Decor</option>
+            <option value="personal">✨ Personal</option>
+            <option value="tech">💻 Tech</option>
+            <option value="other">💬 Other</option>
+          </select>
+          <button class="add-btn" onclick="addIdea()">+ Add idea</button>
+        </div>
+      </div>
+      <div class="ideas-grid" id="ideasGrid"></div>
+    </div>
+  </div>
+
+  <!-- WISHLIST -->
+  <div id="tab-wishlist" style="display:none">
+    <div class="scard">
+      <div class="shead">
+        <div class="shead-left"><span class="sicon">⭐</span><span class="stitle">Wishlist</span><span class="ssub">things you want eventually — no pressure</span></div>
+        <button class="add-btn" onclick="addWish()">+ Add item</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 100px 80px 80px 28px;gap:8px;padding:7px 16px;border-bottom:0.5px solid var(--gray-100);background:var(--gray-50)">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Item</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Est. price</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Category</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Priority</div>
+        <div></div>
+      </div>
+      <div id="wishList"></div>
+    </div>
+    <div style="font-size:12px;color:var(--gray-400);padding:2px;font-style:italic">Review quarterly — promote items to Shopping Lists when you're ready to actually buy them.</div>
+  </div>
+
+  <!-- RESEARCH -->
+  <div id="tab-research" style="display:none">
+    <div class="scard">
+      <div class="shead">
+        <div class="shead-left"><span class="sicon">🔎</span><span class="stitle">Things to Research</span><span class="ssub">articles to read, topics to explore, things to look into</span></div>
+        <button class="add-btn" onclick="addResearch()">+ Add</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 100px 28px;gap:8px;padding:7px 16px;border-bottom:0.5px solid var(--gray-100);background:var(--gray-50)">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Topic</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Notes / link</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Status</div>
+        <div></div>
+      </div>
+      <div id="researchList"></div>
+    </div>
+  </div>
+
+  <!-- SOMEDAY / MAYBE -->
+  <div id="tab-someday" style="display:none">
+    <div class="scard">
+      <div class="shead">
+        <div class="shead-left"><span class="sicon">🌅</span><span class="stitle">Someday / Maybe</span><span class="ssub">big goals, dreams, and ideas for the future — no commitment needed</span></div>
+        <button class="add-btn" onclick="addSomeday()">+ Add</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 110px 28px;gap:8px;padding:7px 16px;border-bottom:0.5px solid var(--gray-100);background:var(--gray-50)">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Dream / goal</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Why it matters</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Horizon</div>
+        <div></div>
+      </div>
+      <div id="somedayList"></div>
+    </div>
+    <div style="font-size:12px;color:var(--gray-400);padding:2px;font-style:italic">No pressure — this is a guilt-free zone. Review once a month and promote anything ready to become a real project.</div>
+  </div>
+
+</div>
+
+<script>
+const KEY = 'mylifehub_parking_v1';
+
+const CAT_META = {
+  home:     {label:'🏠 Home',    color:'#C4B2F0', dot:'#5B3FA8'},
+  reno:     {label:'🔨 Reno',    color:'#FAC775', dot:'#B06820'},
+  garden:   {label:'🌿 Garden',  color:'#9FE1CB', dot:'#2A6E4A'},
+  decor:    {label:'🎨 Decor',   color:'#F0B7D4', dot:'#8B2E5E'},
+  personal: {label:'✨ Personal',color:'#B7D4F0', dot:'#1A4F8A'},
+  tech:     {label:'💻 Tech',    color:'#B2E0D8', dot:'#0F6E56'},
+  other:    {label:'💬 Other',   color:'#D4D2CC', dot:'#5C5B57'},
+};
+const WISH_CATS = ['Home','Furniture','Tech','Clothing','Garden','Experience','Other'];
+const RESEARCH_STATUSES = ['To read','In progress','Done'];
+const STATUS_CLS = {'To read':'chip-toread','In progress':'chip-inprog','Done':'chip-done'};
+const HORIZONS = ['1 year','2-3 years','5+ years','No rush'];
+const DEFAULT_SEED = [
+  {cat:'home',title:'Smart home setup ideas',notes:'Research Alexa vs Google Home integration',starred:false},
+  {cat:'reno',title:'Kitchen backsplash',notes:'Look at subway tile vs herringbone patterns',starred:false},
+  {cat:'garden',title:'Vegetable garden beds',notes:'Back corner of yard, raised beds',starred:true},
+  {cat:'decor',title:'Gallery wall in hallway',notes:'Black frames, mix of photos and prints',starred:false},
+];
+
+let state;
+function load(){
+  try{ state=JSON.parse(localStorage.getItem(KEY))||{} }catch(e){ state={} }
+  if(!state.ideas) state.ideas=DEFAULT_SEED.map((d,i)=>({id:i,...d}));
+  if(!state.wishlist) state.wishlist=[];
+  if(!state.research) state.research=[];
+  if(!state.someday) state.someday=[];
+}
+
+let saveTimer;
+function save(){
+  clearTimeout(saveTimer);
+  const dot=document.getElementById('saveDot');
+  dot.textContent='saving...'; dot.classList.remove('saved');
+  saveTimer=setTimeout(()=>{
+    localStorage.setItem(KEY,JSON.stringify(state));
+    dot.textContent='saved'; dot.classList.add('saved');
+    setTimeout(()=>{ dot.textContent='auto-saving' },1800);
+  },500);
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+function parseAmt(s){return parseFloat(String(s||'').replace(/[$,]/g,''))||0}
+function fmt(n){return n?'$'+n.toLocaleString('en-US',{maximumFractionDigits:0}):''}
+
+/* ── QUICK CAPTURE ── */
+function quickCapture(){
+  const inp=document.getElementById('captureInp');
+  const cat=document.getElementById('captureCat').value;
+  const text=inp.value.trim();
+  if(!text) return;
+  state.ideas.unshift({id:Date.now()+Math.random(),cat,title:text,notes:'',starred:false});
+  inp.value='';
+  save(); renderIdeas(); updateStats();
+  // switch to ideas tab
+  showTab('ideas');
+}
+
+/* ── TABS ── */
+const ALL_TABS=['ideas','wishlist','research','someday'];
+function showTab(id){
+  ALL_TABS.forEach(t=>{ document.getElementById('tab-'+t).style.display=t===id?'block':'none' });
+  document.querySelectorAll('.tab').forEach((b,i)=>{ b.classList.toggle('active',ALL_TABS[i]===id) });
+  if(id==='ideas') renderIdeas();
+  if(id==='wishlist') renderWishlist();
+  if(id==='research') renderResearch();
+  if(id==='someday') renderSomeday();
+}
+
+/* ── IDEAS BOARD ── */
+function addIdea(cat='home'){
+  state.ideas.unshift({id:Date.now()+Math.random(),cat,title:'',notes:'',starred:false});
+  save(); renderIdeas(); updateStats();
+}
+
+function renderIdeas(){
+  const grid=document.getElementById('ideasGrid');
+  const filterVal=document.getElementById('filterCat').value;
+  const searchQ=document.getElementById('searchInp').value.toLowerCase().trim();
+  grid.innerHTML='';
+
+  const items=state.ideas.filter(idea=>{
+    if(filterVal!=='all'&&idea.cat!==filterVal) return false;
+    if(searchQ&&!idea.title.toLowerCase().includes(searchQ)&&!idea.notes.toLowerCase().includes(searchQ)) return false;
+    return true;
+  });
+
+  if(!items.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1">No ideas here yet — use the quick capture bar above or click + Add idea</div>';
+    return;
+  }
+
+  // starred first
+  const sorted=[...items.filter(i=>i.starred),...items.filter(i=>!i.starred)];
+
+  sorted.forEach(idea=>{
+    const idx=state.ideas.indexOf(idea);
+    const meta=CAT_META[idea.cat]||CAT_META.other;
+    const card=document.createElement('div');
+    card.className='idea-card';
+    card.style.background=`linear-gradient(to bottom, ${meta.color}22, var(--white) 60px)`;
+    card.innerHTML=`
+      <div class="idea-card-head">
+        <div class="idea-cat-dot" style="background:${meta.dot}"></div>
+        <textarea class="idea-title-inp" placeholder="Idea title..." rows="2" style="resize:none">${esc(idea.title)}</textarea>
+      </div>
+      <textarea class="idea-notes-inp" placeholder="Notes, details, inspiration..." rows="2">${esc(idea.notes)}</textarea>
+      <div class="idea-foot">
+        <select class="idea-cat-sel">
+          ${Object.entries(CAT_META).map(([k,v])=>`<option value="${k}" ${k===idea.cat?'selected':''}>${v.label}</option>`).join('')}
+        </select>
+        <div class="idea-actions">
+          <button class="promote-btn" style="background:var(--green-light);color:var(--green)" title="Promote to Someday list" onclick="promoteIdea(${idx})">→ Someday</button>
+          <button class="star-btn${idea.starred?' starred':''}" title="Star this idea">⭐</button>
+          <button class="del-btn">✕</button>
+        </div>
+      </div>`;
+    card.querySelector('.idea-title-inp').addEventListener('input',e=>{idea.title=e.target.value;save()});
+    card.querySelector('.idea-notes-inp').addEventListener('input',e=>{idea.notes=e.target.value;save()});
+    card.querySelector('.idea-cat-sel').addEventListener('change',e=>{idea.cat=e.target.value;save();renderIdeas()});
+    card.querySelector('.star-btn').addEventListener('click',()=>{idea.starred=!idea.starred;save();renderIdeas();updateStats()});
+    card.querySelector('.del-btn').addEventListener('click',()=>{state.ideas.splice(idx,1);save();renderIdeas();updateStats()});
+    grid.appendChild(card);
+  });
+}
+
+function promoteIdea(idx){
+  const idea=state.ideas[idx];
+  state.someday.push({id:Date.now()+Math.random(),title:idea.title,why:idea.notes,horizon:'No rush'});
+  state.ideas.splice(idx,1);
+  save(); renderIdeas(); updateStats();
+  alert(`"${idea.title}" moved to Someday / Maybe!`);
+}
+
+/* ── WISHLIST ── */
+function addWish(){
+  state.wishlist.push({id:Date.now()+Math.random(),name:'',price:'',cat:'Home',priority:''});
+  save(); renderWishlist(); updateStats();
+}
+function nextPri(p){return p==='high'?'med':p==='med'?'low':p==='low'?'':'high'}
+function priCls(p){return p==='high'?'pri-high':p==='med'?'pri-med':p==='low'?'pri-low':'pri-none'}
+function priLabel(p){return p==='high'?'High':p==='med'?'Medium':p==='low'?'Low':'Priority'}
+
+function renderWishlist(){
+  const el=document.getElementById('wishList');
+  el.innerHTML='';
+  if(!state.wishlist.length){el.innerHTML='<div class="empty">Nothing on your wishlist yet — add things you\'d love to have eventually</div>';return}
+  state.wishlist.forEach((w,i)=>{
+    const row=document.createElement('div');
+    row.className='wish-row';
+    row.style.gridTemplateColumns='1fr 100px 80px 80px 28px';
+    row.innerHTML=`
+      <input class="wi" placeholder="What do you want?" value="${esc(w.name)}">
+      <input class="wi mono" placeholder="$" value="${esc(w.price)}" style="text-align:right;color:var(--amber)">
+      <select style="border:none;outline:none;background:transparent;font-size:12px;color:var(--gray-600);font-family:'DM Sans',sans-serif;cursor:pointer;width:100%">
+        ${WISH_CATS.map(c=>`<option ${c===w.cat?'selected':''}>${c}</option>`).join('')}
+      </select>
+      <button class="pri-badge ${priCls(w.priority)}">${priLabel(w.priority)}</button>
+      <button class="del-btn">✕</button>`;
+    row.querySelectorAll('.wi')[0].addEventListener('input',e=>{w.name=e.target.value;save()});
+    row.querySelectorAll('.wi')[1].addEventListener('input',e=>{w.price=e.target.value;save();updateStats()});
+    row.querySelector('select').addEventListener('change',e=>{w.cat=e.target.value;save()});
+    row.querySelector('.pri-badge').addEventListener('click',()=>{w.priority=nextPri(w.priority);save();renderWishlist()});
+    row.querySelector('.del-btn').addEventListener('click',()=>{state.wishlist.splice(i,1);save();renderWishlist();updateStats()});
+    el.appendChild(row);
+  });
+}
+
+/* ── RESEARCH ── */
+function addResearch(){
+  state.research.push({id:Date.now()+Math.random(),topic:'',notes:'',status:'To read'});
+  save(); renderResearch(); updateStats();
+}
+function nextStatus(s){const o=RESEARCH_STATUSES;return o[(o.indexOf(s)+1)%o.length]}
+
+function renderResearch(){
+  const el=document.getElementById('researchList');
+  el.innerHTML='';
+  if(!state.research.length){el.innerHTML='<div class="empty">Nothing to research yet — add topics, articles, or questions you want to dig into</div>';return}
+  state.research.forEach((r,i)=>{
+    const row=document.createElement('div');
+    row.className='research-row';
+    row.style.gridTemplateColumns='1fr 1fr 100px 28px';
+    row.innerHTML=`
+      <input class="wi" placeholder="Topic or question..." value="${esc(r.topic)}">
+      <input class="wi" placeholder="Notes, links, or sources..." value="${esc(r.notes)}" style="font-size:12px;color:var(--gray-600)">
+      <button class="status-chip ${STATUS_CLS[r.status]||'chip-toread'}">${r.status}</button>
+      <button class="del-btn">✕</button>`;
+    row.querySelectorAll('.wi')[0].addEventListener('input',e=>{r.topic=e.target.value;save()});
+    row.querySelectorAll('.wi')[1].addEventListener('input',e=>{r.notes=e.target.value;save()});
+    row.querySelector('.status-chip').addEventListener('click',()=>{r.status=nextStatus(r.status);save();renderResearch();updateStats()});
+    row.querySelector('.del-btn').addEventListener('click',()=>{state.research.splice(i,1);save();renderResearch();updateStats()});
+    el.appendChild(row);
+  });
+}
+
+/* ── SOMEDAY ── */
+function addSomeday(){
+  state.someday.push({id:Date.now()+Math.random(),title:'',why:'',horizon:'No rush'});
+  save(); renderSomeday(); updateStats();
+}
+
+function renderSomeday(){
+  const el=document.getElementById('somedayList');
+  el.innerHTML='';
+  if(!state.someday.length){el.innerHTML='<div class="empty">Nothing here yet — add big dreams, future goals, or ideas you\'re not ready to act on yet</div>';return}
+  state.someday.forEach((s,i)=>{
+    const row=document.createElement('div');
+    row.className='someday-row';
+    row.style.gridTemplateColumns='1fr 1fr 110px 28px';
+    row.innerHTML=`
+      <input class="sd-title" placeholder="Dream or goal..." value="${esc(s.title)}">
+      <input class="sd-why" placeholder="Why does this matter to you?" value="${esc(s.why)}">
+      <select class="horizon-sel">
+        ${HORIZONS.map(h=>`<option ${h===s.horizon?'selected':''}>${h}</option>`).join('')}
+      </select>
+      <button class="del-btn">✕</button>`;
+    row.querySelector('.sd-title').addEventListener('input',e=>{s.title=e.target.value;save()});
+    row.querySelector('.sd-why').addEventListener('input',e=>{s.why=e.target.value;save()});
+    row.querySelector('.horizon-sel').addEventListener('change',e=>{s.horizon=e.target.value;save()});
+    row.querySelector('.del-btn').addEventListener('click',()=>{state.someday.splice(i,1);save();renderSomeday();updateStats()});
+    el.appendChild(row);
+  });
+}
+
+/* ── SEARCH ── */
+function doSearch(){
+  renderIdeas();
+}
+
+/* ── STATS ── */
+function updateStats(){
+  const starred=state.ideas.filter(i=>i.starred).length;
+  document.getElementById('statIdeas').textContent=state.ideas.length;
+  document.getElementById('statStarred').textContent=`${starred} starred`;
+
+  const wishEst=state.wishlist.reduce((s,w)=>s+parseAmt(w.price),0);
+  document.getElementById('statWish').textContent=state.wishlist.length;
+  document.getElementById('statWishEst').textContent=wishEst?fmt(wishEst)+' estimated':'$0 estimated';
+
+  const resDone=state.research.filter(r=>r.status==='Done').length;
+  document.getElementById('statResearch').textContent=state.research.length;
+  document.getElementById('statResearchDone').textContent=`${resDone} done`;
+
+  document.getElementById('statSomeday').textContent=state.someday.length;
+}
+
+/* ── INIT ── */
+load();
+renderIdeas();
+updateStats();
+</script>
+</body>
+</html>

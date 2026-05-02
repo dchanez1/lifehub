@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Maintenance Tracker — My Life Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple:       #5B3FA8;
+  --purple-mid:   #7B5FC8;
+  --purple-light: #EEEDFE;
+  --purple-soft:  #F4F2FF;
+  --green:        #2A6E4A;
+  --green-light:  #E8F5EF;
+  --amber:        #B06820;
+  --amber-light:  #FEF3E2;
+  --orange:       #C4784A;
+  --orange-light: #FAEEE3;
+  --red:          #8B2E2E;
+  --red-light:    #FDEAEA;
+  --blue:         #1A4F8A;
+  --blue-light:   #E6F0FB;
+  --teal:         #0F6E56;
+  --teal-light:   #E1F5EE;
+  --gray-50:      #FAFAF9;
+  --gray-100:     #F4F3F0;
+  --gray-200:     #E5E4DF;
+  --gray-300:     #CECDC8;
+  --gray-400:     #9B9A94;
+  --gray-600:     #5C5B57;
+  --gray-800:     #2C2C2A;
+  --white:        #FFFFFF;
+  --radius:       10px;
+  --radius-lg:    14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh}
+
+.topbar{background:var(--purple);padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
+.topbar-left .hub-label{font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);letter-spacing:0.08em;text-transform:uppercase}
+.topbar-left .page-title{font-size:18px;font-weight:600;color:#fff;letter-spacing:-0.01em}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.save-dot{font-size:11px;color:rgba(255,255,255,0.45);font-family:'DM Mono',monospace;transition:color 0.3s}
+.save-dot.saved{color:#6EE7A8}
+.home-addr{font-size:12px;color:rgba(255,255,255,0.6);font-style:italic}
+
+.page{max-width:1120px;margin:0 auto;padding:22px 22px 48px}
+
+/* summary strip */
+.stat-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--white);border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:13px 16px}
+.stat-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:5px}
+.stat-val{font-size:22px;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:-0.02em}
+.stat-sub{font-size:11px;color:var(--gray-400);margin-top:3px}
+.c-green{color:var(--green)} .c-amber{color:var(--amber)} .c-red{color:var(--red)} .c-blue{color:var(--blue)}
+
+/* tabs */
+.tabs{display:flex;gap:2px;background:var(--gray-100);border-radius:var(--radius);padding:3px;margin-bottom:16px;flex-wrap:wrap;width:fit-content}
+.tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;color:var(--gray-600);cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;transition:all 0.15s;white-space:nowrap}
+.tab.active{background:var(--white);color:var(--gray-800);box-shadow:0 0 0 0.5px var(--gray-200)}
+
+/* section cards */
+.scard{background:var(--white);border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:14px}
+.shead{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:0.5px solid var(--gray-100)}
+.shead-left{display:flex;align-items:center;gap:8px}
+.sicon{font-size:15px}
+.stitle{font-size:13px;font-weight:600;color:var(--gray-800)}
+.ssub{font-size:11px;color:var(--gray-400);margin-left:4px}
+.add-btn{font-size:12px;font-weight:500;color:var(--purple);background:var(--purple-light);border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s}
+.add-btn:hover{background:#DDDAFC}
+
+/* checklist rows */
+.check-row{display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:0.5px solid var(--gray-50);transition:background 0.1s}
+.check-row:last-child{border-bottom:none}
+.check-row:hover{background:var(--gray-50)}
+.check-row input[type=checkbox]{accent-color:var(--purple);width:15px;height:15px;cursor:pointer;flex-shrink:0;margin-top:2px}
+.check-label{font-size:13px;color:var(--gray-800);flex:1;line-height:1.4}
+.check-label.done{text-decoration:line-through;color:var(--gray-400)}
+.check-note{font-size:11px;color:var(--gray-400);margin-top:2px}
+.check-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.freq-pill{font-size:10px;font-weight:500;padding:2px 7px;border-radius:6px;white-space:nowrap}
+.f-monthly{background:#E8F5EF;color:#1A5C38}
+.f-seasonal{background:#E6F0FB;color:#0C447C}
+.f-annual{background:#FAEEDA;color:#633806}
+.f-asneeded{background:#F1EFE8;color:#5F5E5A}
+.priority-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.p-high{background:var(--red)}
+.p-med{background:var(--amber)}
+.p-low{background:var(--green)}
+
+/* season tabs inside seasonal */
+.season-tabs{display:flex;gap:0;border-bottom:0.5px solid var(--gray-200)}
+.season-tab{padding:9px 18px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;color:var(--gray-400);border-bottom:2px solid transparent;transition:all 0.15s}
+.season-tab.active{color:var(--purple);border-bottom-color:var(--purple)}
+.season-panel{display:none}
+.season-panel.active{display:block}
+.season-header{padding:10px 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);background:var(--gray-50);border-bottom:0.5px solid var(--gray-100)}
+
+/* repair log */
+.repair-row{display:grid;grid-template-columns:90px 1fr 90px 80px 90px 28px;gap:8px;align-items:center;padding:9px 16px;border-bottom:0.5px solid var(--gray-50);transition:background 0.1s}
+.repair-row:last-child{border-bottom:none}
+.repair-row:hover{background:var(--gray-50)}
+.ri{border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--gray-800);width:100%}
+.ri::placeholder{color:var(--gray-300);font-style:italic}
+.ri.mono{font-family:'DM Mono',monospace;font-size:12px}
+.status-sel{border:none;outline:none;background:transparent;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;color:var(--gray-600);width:100%}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--gray-300);font-size:13px;transition:color 0.15s;line-height:1}
+.del-btn:hover{color:var(--red)}
+.status-done{color:var(--green);font-weight:500}
+.status-progress{color:var(--amber);font-weight:500}
+.status-todo{color:var(--gray-400)}
+
+/* appliances */
+.appl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;padding:14px}
+.appl-card{border:0.5px solid var(--gray-200);border-radius:var(--radius);overflow:hidden}
+.appl-head{padding:9px 12px;background:var(--gray-50);border-bottom:0.5px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between}
+.appl-name-input{border:none;outline:none;background:transparent;font-size:13px;font-weight:500;color:var(--gray-800);font-family:'DM Sans',sans-serif;flex:1}
+.appl-body{padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.appl-field{display:flex;flex-direction:column;gap:2px}
+.appl-field-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)}
+.appl-field input{border:none;outline:none;background:transparent;font-size:12px;color:var(--gray-800);font-family:'DM Sans',sans-serif;border-bottom:0.5px solid var(--gray-200);padding-bottom:2px}
+.appl-field input::placeholder{color:var(--gray-300)}
+.warranty-ok{color:var(--green)}
+.warranty-exp{color:var(--red)}
+
+/* contacts */
+.contact-card{border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:10px}
+.contact-head{padding:10px 16px;background:var(--gray-50);border-bottom:0.5px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between}
+.contact-body{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+.contact-cell{padding:9px 16px;border-right:0.5px solid var(--gray-100)}
+.contact-cell:last-child{border-right:none}
+.contact-field-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:3px}
+.contact-input{border:none;outline:none;background:transparent;font-size:13px;color:var(--gray-800);font-family:'DM Sans',sans-serif;width:100%}
+.contact-input::placeholder{color:var(--gray-300);font-style:italic}
+.contact-type-pill{font-size:10px;font-weight:500;padding:3px 8px;border-radius:6px}
+
+/* paint tracker */
+.paint-row{display:grid;grid-template-columns:1fr 1fr 1fr 110px 28px;gap:8px;align-items:center;padding:9px 16px;border-bottom:0.5px solid var(--gray-50)}
+.paint-row:last-child{border-bottom:none}
+.swatch{width:24px;height:24px;border-radius:4px;border:0.5px solid var(--gray-200);cursor:pointer;flex-shrink:0}
+
+/* assignee avatars */
+.avatar{width:22px;height:22px;border-radius:50%;font-size:10px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;user-select:none}
+.avatar.me{background:#EEEDFE;color:#3C3489;border-color:#AFA9EC}
+.avatar.partner{background:#E8F5EF;color:#1A5C38;border-color:#9FE1CB}
+.avatar.sister{background:#FAEEDA;color:#633806;border-color:#FAC775}
+.avatar.unassigned{background:var(--gray-100);color:var(--gray-400);border-color:var(--gray-200)}
+.avatar.selected{box-shadow:0 0 0 2px var(--purple)}
+.due-tag{font-size:10px;font-weight:500;padding:2px 7px;border-radius:5px;white-space:nowrap;font-family:'DM Mono',monospace}
+.due-ok{background:#E8F5EF;color:#1A5C38}
+.due-soon{background:#FAEEDA;color:#633806}
+.due-overdue{background:#FDEAEA;color:#8B2E2E}
+.due-none{background:var(--gray-100);color:var(--gray-400)}
+/* people settings bar */
+.people-bar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--purple-soft);border-bottom:0.5px solid var(--gray-200);font-size:12px;flex-wrap:wrap}
+.people-bar label{color:var(--purple);font-weight:500}
+.people-input{border:none;outline:none;background:var(--white);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--gray-800);font-family:'DM Sans',sans-serif;border:0.5px solid var(--gray-200);width:100px}
+/* repair row updated */
+.repair-row{display:grid;grid-template-columns:90px 1fr 80px 70px 80px 90px 28px;gap:6px;align-items:center;padding:9px 16px;border-bottom:0.5px solid var(--gray-50);transition:background 0.1s}
+.repair-row:last-child{border-bottom:none}
+.repair-row:hover{background:var(--gray-50)}
+/* two col */
+.two-col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media(max-width:720px){.two-col,.stat-row,.contact-body{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="hub-label">My Life Hub</div>
+    <div class="page-title">Home Maintenance Tracker</div>
+  </div>
+  <div class="topbar-right">
+    <span class="home-addr" id="homeAddr" onclick="editAddr()" title="Click to edit address" style="cursor:pointer"></span>
+    <span class="save-dot" id="saveDot">auto-saving</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Stats -->
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-label">Tasks this season</div>
+      <div class="stat-val c-purple" id="statSeason">0</div>
+      <div class="stat-sub" id="statSeasonDone">0 completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Open repairs</div>
+      <div class="stat-val c-amber" id="statRepairs">0</div>
+      <div class="stat-sub">in progress or to-do</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Appliances tracked</div>
+      <div class="stat-val c-blue" id="statAppl">0</div>
+      <div class="stat-sub" id="statWarranty">0 warranties active</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Service contacts</div>
+      <div class="stat-val c-green" id="statContacts">0</div>
+      <div class="stat-sub">saved in your hub</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('seasonal')">Seasonal Checklists</button>
+    <button class="tab" onclick="showTab('repairs')">Repair Log</button>
+    <button class="tab" onclick="showTab('appliances')">Appliances</button>
+    <button class="tab" onclick="showTab('contacts')">Service Contacts</button>
+    <button class="tab" onclick="showTab('paint')">Paint & Materials</button>
+  </div>
+
+  <!-- SEASONAL CHECKLISTS -->
+  <div id="tab-seasonal">
+    <div class="scard">
+      <div class="people-bar">
+        <label>People:</label>
+        <span style="color:var(--gray-600)">Me:</span><input class="people-input" id="nameme" placeholder="Your name" oninput="savePeople()">
+        <span style="color:var(--gray-600)">Partner:</span><input class="people-input" id="namepartner" placeholder="Partner's name" oninput="savePeople()">
+        <span style="color:var(--gray-600)">Sister:</span><input class="people-input" id="namesister" placeholder="Sister's name" oninput="savePeople()">
+        <span style="font-size:11px;color:var(--purple-mid);margin-left:4px">Click an avatar on any task to assign it</span>
+      </div>
+      <div class="season-tabs">
+        <button class="season-tab active" onclick="showSeason('spring')">🌱 Spring</button>
+        <button class="season-tab" onclick="showSeason('summer')">☀️ Summer</button>
+        <button class="season-tab" onclick="showSeason('fall')">🍂 Fall</button>
+        <button class="season-tab" onclick="showSeason('winter')">❄️ Winter</button>
+        <button class="season-tab" onclick="showSeason('monthly')">📅 Monthly</button>
+      </div>
+      <div id="seasonal-content"></div>
+    </div>
+    <div style="font-size:12px;color:var(--gray-400);font-style:italic;padding:2px">Tip: Check items off each season — they reset automatically for the next cycle when you start a new season.</div>
+  </div>
+
+  <!-- REPAIR LOG -->
+  <div id="tab-repairs" style="display:none">
+    <div class="scard">
+      <div class="shead">
+        <div class="shead-left">
+          <span class="sicon">🔨</span>
+          <span class="stitle">Repair & Project Log</span>
+          <span class="ssub" id="repairCount"></span>
+        </div>
+        <button class="add-btn" onclick="addRepair()">+ Add Repair</button>
+      </div>
+      <div style="display:grid;grid-template-columns:90px 1fr 80px 70px 80px 90px 28px;gap:6px;padding:8px 16px;border-bottom:0.5px solid var(--gray-100);background:var(--gray-50)">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Date</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Description</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Assigned</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Due</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Cost</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Status</div>
+        <div></div>
+      </div>
+      <div id="repairList"></div>
+    </div>
+  </div>
+
+  <!-- APPLIANCES -->
+  <div id="tab-appliances" style="display:none">
+    <div class="scard">
+      <div class="shead">
+        <div class="shead-left"><span class="sicon">🏠</span><span class="stitle">Appliances & Systems</span><span class="ssub">model numbers, warranties, service dates</span></div>
+        <button class="add-btn" onclick="addAppliance()">+ Add Appliance</button>
+      </div>
+      <div id="applianceGrid" class="appl-grid"></div>
+    </div>
+  </div>
+
+  <!-- SERVICE CONTACTS -->
+  <div id="tab-contacts" style="display:none">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button class="add-btn" onclick="addContact()">+ Add Contact</button>
+    </div>
+    <div id="contactList"></div>
+  </div>
+
+  <!-- PAINT & MATERIALS -->
+  <div id="tab-paint" style="display:none">
+    <div class="scard">
+      <div class="shead">
+        <div class="shead-left"><span class="sicon">🎨</span><span class="stitle">Paint Colors & Materials</span><span class="ssub">per room</span></div>
+        <button class="add-btn" onclick="addPaint()">+ Add Room</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 110px 28px;gap:8px;padding:8px 16px;border-bottom:0.5px solid var(--gray-100);background:var(--gray-50)">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Room</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Color / Brand</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Finish / Notes</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400)">Swatch</div>
+        <div></div>
+      </div>
+      <div id="paintList"></div>
+    </div>
+    <div class="scard">
+      <div class="shead"><div class="shead-left"><span class="sicon">🪵</span><span class="stitle">Other Materials & Specs</span><span class="ssub">flooring, tile, countertops, etc.</span></div><button class="add-btn" onclick="addMaterial()">+ Add</button></div>
+      <div id="materialList"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const KEY = 'mylifehub_maintenance_v1';
+
+const SEASONAL_DEFAULTS = {
+  spring: [
+    {id:'sp1', task:'Check roof for winter damage, missing shingles, flashing', freq:'annual', priority:'high', done:false},
+    {id:'sp2', task:'Clean gutters and downspouts', freq:'seasonal', priority:'high', done:false},
+    {id:'sp3', task:'Inspect and test sump pump', freq:'annual', priority:'high', done:false},
+    {id:'sp4', task:'Schedule HVAC tune-up / replace filter', freq:'seasonal', priority:'high', done:false},
+    {id:'sp5', task:'Check attic for leaks, pests, or insulation damage', freq:'annual', priority:'med', done:false},
+    {id:'sp6', task:'Inspect caulking around windows, doors, tubs', freq:'annual', priority:'med', done:false},
+    {id:'sp7', task:'Check driveway and walkways for cracks — seal if needed', freq:'annual', priority:'med', done:false},
+    {id:'sp8', task:'Service lawn mower and outdoor equipment', freq:'annual', priority:'low', done:false},
+    {id:'sp9', task:'Fertilize and aerate lawn', freq:'seasonal', priority:'low', done:false},
+    {id:'sp10', task:'Pest inspection', freq:'annual', priority:'med', done:false},
+    {id:'sp11', task:'Deep clean appliances (fridge coils, dishwasher filter)', freq:'annual', priority:'low', done:false},
+    {id:'sp12', task:'Turn on outdoor faucets / irrigation', freq:'annual', priority:'med', done:false},
+    {id:'sp13', task:'Inspect deck/patio for damage, re-seal if needed', freq:'annual', priority:'low', done:false},
+  ],
+  summer: [
+    {id:'su1', task:'Check A/C — test cooling, clean coils, change filter', freq:'seasonal', priority:'high', done:false},
+    {id:'su2', task:'Inspect and clean dryer vent duct', freq:'annual', priority:'high', done:false},
+    {id:'su3', task:'Check window and door screens for tears', freq:'annual', priority:'low', done:false},
+    {id:'su4', task:'Inspect exterior paint for peeling or cracking', freq:'annual', priority:'med', done:false},
+    {id:'su5', task:'Check sprinkler/irrigation system for leaks', freq:'seasonal', priority:'med', done:false},
+    {id:'su6', task:'Trim trees and shrubs away from house', freq:'seasonal', priority:'med', done:false},
+    {id:'su7', task:'Test smoke and CO detectors, replace batteries', freq:'seasonal', priority:'high', done:false},
+    {id:'su8', task:'Check garage door safety reversal function', freq:'annual', priority:'med', done:false},
+    {id:'su9', task:'Inspect foundation for cracks', freq:'annual', priority:'high', done:false},
+  ],
+  fall: [
+    {id:'fa1', task:'Clean gutters after leaves fall', freq:'seasonal', priority:'high', done:false},
+    {id:'fa2', task:'Schedule furnace/heat tune-up', freq:'seasonal', priority:'high', done:false},
+    {id:'fa3', task:'Winterize outdoor faucets — shut off and drain', freq:'annual', priority:'high', done:false},
+    {id:'fa4', task:'Flush and drain water heater (removes sediment)', freq:'annual', priority:'med', done:false},
+    {id:'fa5', task:'Seal gaps around windows and doors (weatherstripping)', freq:'annual', priority:'med', done:false},
+    {id:'fa6', task:'Blow out irrigation/sprinkler system', freq:'annual', priority:'high', done:false},
+    {id:'fa7', task:'Clean dryer vent duct', freq:'annual', priority:'high', done:false},
+    {id:'fa8', task:'Stock emergency supplies: flashlights, batteries, blankets', freq:'annual', priority:'med', done:false},
+    {id:'fa9', task:'Check chimney / fireplace if applicable', freq:'annual', priority:'med', done:false},
+    {id:'fa10', task:'Aerate and overseed lawn', freq:'seasonal', priority:'low', done:false},
+    {id:'fa11', task:'Store outdoor furniture and garden equipment', freq:'annual', priority:'low', done:false},
+    {id:'fa12', task:'Reverse ceiling fans to clockwise (pushes heat down)', freq:'annual', priority:'low', done:false},
+  ],
+  winter: [
+    {id:'wi1', task:'Check insulation in attic — add if needed', freq:'annual', priority:'med', done:false},
+    {id:'wi2', task:'Keep cabinet doors open in extreme cold (protect pipes)', freq:'asneeded', priority:'high', done:false},
+    {id:'wi3', task:'Clear snow/ice from roof and gutters', freq:'asneeded', priority:'high', done:false},
+    {id:'wi4', task:'Test smoke and CO detectors', freq:'seasonal', priority:'high', done:false},
+    {id:'wi5', task:'Check for ice dams forming on roof', freq:'asneeded', priority:'high', done:false},
+    {id:'wi6', task:'Inspect and replace HVAC filter', freq:'seasonal', priority:'med', done:false},
+    {id:'wi7', task:'Check water heater temperature (set to 120°F)', freq:'annual', priority:'low', done:false},
+    {id:'wi8', task:'Lubricate door hinges and locks', freq:'annual', priority:'low', done:false},
+    {id:'wi9', task:'Review home insurance coverage', freq:'annual', priority:'med', done:false},
+  ],
+  monthly: [
+    {id:'mo1', task:'Replace HVAC filter (1" filters)', freq:'monthly', priority:'high', done:false},
+    {id:'mo2', task:'Test smoke and CO detectors', freq:'monthly', priority:'high', done:false},
+    {id:'mo3', task:'Check fire extinguisher pressure gauge', freq:'monthly', priority:'high', done:false},
+    {id:'mo4', task:'Run water in unused sinks/showers (prevents dry traps)', freq:'monthly', priority:'low', done:false},
+    {id:'mo5', task:'Clean garbage disposal (ice + baking soda)', freq:'monthly', priority:'low', done:false},
+    {id:'mo6', task:'Check water softener salt level if applicable', freq:'monthly', priority:'low', done:false},
+    {id:'mo7', task:'Inspect for any visible leaks under sinks', freq:'monthly', priority:'high', done:false},
+    {id:'mo8', task:'Clean range hood filter', freq:'monthly', priority:'low', done:false},
+  ],
+};
+
+const CONTACT_TYPES = ['Plumber','Electrician','HVAC','Roofer','Pest Control','Landscaper','Handyman','Painter','General Contractor','Inspector','HOA','Utility','Other'];
+const APPL_ICONS = {'Refrigerator':'🧊','Dishwasher':'🍽️','Oven / Range':'🔥','Microwave':'📡','Washer':'🫧','Dryer':'💨','HVAC / Furnace':'🌡️','Water Heater':'🚿','Garage Door Opener':'🚗','Security System':'🔒','Generator':'⚡','Other':'🏠'};
+
+let state;
+
+function load() {
+  try { state = JSON.parse(localStorage.getItem(KEY)) || {} } catch(e) { state={} }
+  if(!state.seasonal) { state.seasonal={}; Object.keys(SEASONAL_DEFAULTS).forEach(s=>{ state.seasonal[s]=JSON.parse(JSON.stringify(SEASONAL_DEFAULTS[s])) }) }
+  if(!state.repairs) state.repairs=[];
+  if(!state.appliances) state.appliances=[];
+  if(!state.contacts) state.contacts=[];
+  if(!state.paint) state.paint=[];
+  if(!state.materials) state.materials=[];
+  if(!state.addr) state.addr='';
+  if(!state.people) state.people={me:'Me',partner:'Partner',sister:'Sister'};
+  // ensure all seasons exist
+  Object.keys(SEASONAL_DEFAULTS).forEach(s=>{ if(!state.seasonal[s]) state.seasonal[s]=JSON.parse(JSON.stringify(SEASONAL_DEFAULTS[s])) });
+}
+
+let saveTimer;
+function save() {
+  clearTimeout(saveTimer);
+  const dot = document.getElementById('saveDot');
+  dot.textContent='saving...'; dot.classList.remove('saved');
+  saveTimer=setTimeout(()=>{
+    localStorage.setItem(KEY,JSON.stringify(state));
+    dot.textContent='saved'; dot.classList.add('saved');
+    setTimeout(()=>{ dot.textContent='auto-saving' },1800);
+  },500);
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+function fmt(n){const v=parseFloat(n)||0;return '$'+v.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})}
+
+/* ── ADDRESS ── */
+function editAddr(){
+  const a=prompt('Enter your home address:',state.addr||'');
+  if(a!==null){state.addr=a;save();document.getElementById('homeAddr').textContent=a||'Add address ✎'}
+}
+
+/* ── PEOPLE ── */
+function savePeople(){
+  state.people.me=document.getElementById('nameme').value||'Me';
+  state.people.partner=document.getElementById('namepartner').value||'Partner';
+  state.people.sister=document.getElementById('namesister').value||'Sister';
+  save(); renderSeasonal();
+}
+function loadPeople(){
+  document.getElementById('nameme').value=state.people.me==='Me'?'':state.people.me;
+  document.getElementById('namepartner').value=state.people.partner==='Partner'?'':state.people.partner;
+  document.getElementById('namesister').value=state.people.sister==='Sister'?'':state.people.sister;
+}
+function initials(name){ return name?name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2):'?' }
+function personLabel(key){ return key==='me'?state.people.me:key==='partner'?state.people.partner:key==='sister'?state.people.sister:'—' }
+function dueCls(dateStr){
+  if(!dateStr) return 'due-none';
+  const d=new Date(dateStr); const now=new Date(); now.setHours(0,0,0,0);
+  const diff=Math.ceil((d-now)/(1000*60*60*24));
+  if(diff<0) return 'due-overdue';
+  if(diff<=5) return 'due-soon';
+  return 'due-ok';
+}
+function dueLabel(dateStr){
+  if(!dateStr) return 'No due date';
+  const d=new Date(dateStr); const now=new Date(); now.setHours(0,0,0,0);
+  const diff=Math.ceil((d-now)/(1000*60*60*24));
+  if(diff<0) return `${Math.abs(diff)}d overdue`;
+  if(diff===0) return 'Due today';
+  if(diff===1) return 'Due tomorrow';
+  if(diff<=7) return `Due in ${diff}d`;
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+function avatarHTML(assignee, taskKey, idx){
+  const people=['me','partner','sister'];
+  return people.map(p=>{
+    const sel=assignee===p;
+    const lbl=initials(personLabel(p));
+    return `<span class="avatar ${p}${sel?' selected':''}" title="${personLabel(p)}" data-person="${p}" data-key="${taskKey}" data-idx="${idx}">${lbl}</span>`;
+  }).join('');
+}
+
+/* ── TABS ── */
+let currentTab='seasonal';
+function showTab(id){
+  ['seasonal','repairs','appliances','contacts','paint'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===id?'block':'none';
+  });
+  document.querySelectorAll('.tab').forEach((b,i)=>{
+    b.classList.toggle('active',['seasonal','repairs','appliances','contacts','paint'][i]===id);
+  });
+  currentTab=id;
+  if(id==='repairs') renderRepairs();
+  if(id==='appliances') renderAppliances();
+  if(id==='contacts') renderContacts();
+  if(id==='paint') renderPaint();
+  updateStats();
+}
+
+/* ── SEASONAL ── */
+let currentSeason='spring';
+function showSeason(s){
+  currentSeason=s;
+  document.querySelectorAll('.season-tab').forEach((b,i)=>{
+    b.classList.toggle('active',['spring','summer','fall','winter','monthly'][i]===s);
+  });
+  renderSeasonal();
+}
+
+const SEASON_LABELS={spring:'Spring Tasks',summer:'Summer Tasks',fall:'Fall Tasks',winter:'Winter Tasks',monthly:'Monthly Tasks'};
+const FREQ_LABELS={monthly:'Monthly',seasonal:'Each Season',annual:'Annual','asneeded':'As Needed'};
+const FREQ_CLS={monthly:'f-monthly',seasonal:'f-seasonal',annual:'f-annual','asneeded':'f-asneeded'};
+
+function renderSeasonal(){
+  const content=document.getElementById('seasonal-content');
+  const tasks=state.seasonal[currentSeason]||[];
+  const done=tasks.filter(t=>t.done).length;
+
+  content.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--gray-50);border-bottom:0.5px solid var(--gray-100)">
+      <span style="font-size:12px;font-weight:500;color:var(--gray-600)">${done}/${tasks.length} completed</span>
+      <div style="display:flex;gap:8px">
+        <button onclick="resetSeason('${currentSeason}')" style="font-size:11px;color:var(--gray-400);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif">Reset all</button>
+        <button onclick="addSeasonTask('${currentSeason}')" class="add-btn">+ Add task</button>
+      </div>
+    </div>
+    <div style="height:4px;background:var(--gray-100)"><div style="height:100%;background:var(--purple);width:${tasks.length?Math.round(done/tasks.length*100):0}%;transition:width 0.4s;border-radius:0 2px 2px 0"></div></div>`;
+
+  const priorities=['high','med','low'];
+  const pLabels={high:'High priority',med:'Medium priority',low:'Low priority'};
+  priorities.forEach(pri=>{
+    const group=tasks.filter(t=>t.priority===pri);
+    if(!group.length) return;
+    const grpDiv=document.createElement('div');
+    grpDiv.innerHTML=`<div class="season-header">${pLabels[pri]}</div>`;
+    group.forEach((task)=>{
+      const idx=tasks.indexOf(task);
+      const row=document.createElement('div');
+      row.className='check-row';
+      row.style.flexWrap='wrap';
+      const dCls=dueCls(task.due);
+      const dLbl=dueLabel(task.due);
+      row.innerHTML=`
+        <div class="priority-dot p-${task.priority}"></div>
+        <input type="checkbox" ${task.done?'checked':''}>
+        <div style="flex:1;min-width:160px">
+          <div class="check-label${task.done?' done':''}">${esc(task.task)}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap">
+            ${avatarHTML(task.assignee||'',currentSeason,idx)}
+            <span style="font-size:10px;color:var(--gray-400);margin-left:2px">${task.assignee?personLabel(task.assignee):'Unassigned'}</span>
+          </div>
+        </div>
+        <div class="check-actions" style="flex-wrap:wrap;gap:5px">
+          <span class="freq-pill ${FREQ_CLS[task.freq]||'f-asneeded'}">${FREQ_LABELS[task.freq]||task.freq}</span>
+          <span class="due-tag ${dCls}">${dLbl}</span>
+          <input type="date" value="${task.due||''}" title="Set due date"
+            style="border:none;outline:none;background:transparent;font-size:10px;color:var(--gray-400);font-family:'DM Sans',sans-serif;cursor:pointer;width:30px;opacity:0.5"
+            data-due-idx="${idx}">
+          <button class="del-btn" onclick="removeSeasonTask('${currentSeason}',${idx})">✕</button>
+        </div>`;
+
+      row.querySelector('input[type=checkbox]').addEventListener('change',e=>{
+        state.seasonal[currentSeason][idx].done=e.target.checked;
+        save(); renderSeasonal(); updateStats();
+      });
+      row.querySelector('input[type=date]').addEventListener('change',e=>{
+        state.seasonal[currentSeason][idx].due=e.target.value;
+        save(); renderSeasonal();
+      });
+      row.querySelectorAll('.avatar').forEach(av=>{
+        av.addEventListener('click',()=>{
+          const p=av.dataset.person;
+          const t=state.seasonal[currentSeason][idx];
+          t.assignee = t.assignee===p ? '' : p;
+          save(); renderSeasonal();
+        });
+      });
+      grpDiv.appendChild(row);
+    });
+    content.appendChild(grpDiv);
+  });
+  updateStats();
+}
+
+function addSeasonTask(s){
+  const task=prompt('Task description:');
+  if(!task) return;
+  const freq=prompt('Frequency? (monthly / seasonal / annual / asneeded)','seasonal')||'seasonal';
+  const pri=prompt('Priority? (high / med / low)','med')||'med';
+  state.seasonal[s].push({id:'custom-'+Date.now(),task,freq,priority:pri,done:false});
+  save(); renderSeasonal();
+}
+
+function removeSeasonTask(s,idx){
+  state.seasonal[s].splice(idx,1); save(); renderSeasonal();
+}
+
+function resetSeason(s){
+  if(!confirm('Reset all checkboxes for this season?')) return;
+  state.seasonal[s].forEach(t=>t.done=false); save(); renderSeasonal();
+}
+
+/* ── REPAIRS ── */
+function addRepair(){
+  state.repairs.unshift({id:Date.now(),date:'',desc:'',assignee:'',due:'',cost:'',status:'To-do'});
+  save(); renderRepairs();
+}
+
+function renderRepairs(){
+  const list=document.getElementById('repairList');
+  list.innerHTML='';
+  const open=state.repairs.filter(r=>r.status!=='Done').length;
+  document.getElementById('repairCount').textContent=open?`${open} open`:'';
+
+  state.repairs.forEach((r,i)=>{
+    const div=document.createElement('div');
+    div.className='repair-row';
+    const statusCls=r.status==='Done'?'status-done':r.status==='In progress'?'status-progress':'status-todo';
+    const dCls=dueCls(r.due);
+    const assigneeName = r.assignee ? personLabel(r.assignee) : '—';
+    div.innerHTML=`
+      <input class="ri mono" placeholder="Date..." value="${esc(r.date)}">
+      <input class="ri" placeholder="Describe the repair or project..." value="${esc(r.desc)}">
+      <div style="display:flex;align-items:center;gap:4px">
+        ${['me','partner','sister'].map(p=>`<span class="avatar ${p}${r.assignee===p?' selected':''}" title="${personLabel(p)}" data-p="${p}">${initials(personLabel(p))}</span>`).join('')}
+      </div>
+      <input type="date" class="ri mono" value="${esc(r.due)}" style="font-size:11px;color:${r.due?'var(--gray-800)':'var(--gray-300)'}">
+      <input class="ri mono" placeholder="$0" value="${esc(r.cost)}">
+      <select class="status-sel ${statusCls}">
+        ${['To-do','In progress','Done'].map(s=>`<option ${s===r.status?'selected':''}>${s}</option>`).join('')}
+      </select>
+      <button class="del-btn">✕</button>`;
+
+    div.querySelectorAll('input')[0].addEventListener('input',e=>{r.date=e.target.value;save()});
+    div.querySelectorAll('input')[1].addEventListener('input',e=>{r.desc=e.target.value;save()});
+    div.querySelectorAll('input')[2].addEventListener('change',e=>{r.due=e.target.value;save();renderRepairs()});
+    div.querySelectorAll('input')[3].addEventListener('input',e=>{r.cost=e.target.value;save()});
+    div.querySelector('select').addEventListener('change',e=>{r.status=e.target.value;save();renderRepairs();updateStats()});
+    div.querySelector('.del-btn').addEventListener('click',()=>{state.repairs.splice(i,1);save();renderRepairs();updateStats()});
+    div.querySelectorAll('.avatar').forEach(av=>{
+      av.addEventListener('click',()=>{
+        r.assignee = r.assignee===av.dataset.p ? '' : av.dataset.p;
+        save(); renderRepairs();
+      });
+    });
+    list.appendChild(div);
+  });
+  updateStats();
+}
+
+/* ── APPLIANCES ── */
+function addAppliance(){
+  const name=prompt('Appliance name (e.g. Refrigerator, HVAC):','');
+  if(!name) return;
+  state.appliances.push({id:Date.now(),name,type:'Other',model:'',serial:'',brand:'',purchased:'',warrantyExp:'',lastService:'',nextService:'',notes:''});
+  save(); renderAppliances();
+}
+
+function renderAppliances(){
+  const grid=document.getElementById('applianceGrid');
+  grid.innerHTML='';
+  state.appliances.forEach((a,i)=>{
+    const icon=APPL_ICONS[a.name]||APPL_ICONS['Other'];
+    const warr=a.warrantyExp?checkWarranty(a.warrantyExp):'';
+    const card=document.createElement('div');
+    card.className='appl-card';
+    card.innerHTML=`
+      <div class="appl-head">
+        <span style="font-size:18px;margin-right:8px">${icon}</span>
+        <input class="appl-name-input" value="${esc(a.name)}" placeholder="Appliance name">
+        ${warr?`<span style="font-size:10px;font-weight:500;padding:2px 7px;border-radius:5px;background:${warr==='ok'?'var(--green-light)':'var(--red-light)'};color:${warr==='ok'?'var(--green)':'var(--red)'}">${warr==='ok'?'Warranty active':'Expired'}</span>`:''}
+        <button class="del-btn" style="margin-left:auto">✕</button>
+      </div>
+      <div class="appl-body">
+        <div class="appl-field"><div class="appl-field-label">Brand</div><input placeholder="e.g. LG" value="${esc(a.brand)}"></div>
+        <div class="appl-field"><div class="appl-field-label">Model #</div><input placeholder="Model number" value="${esc(a.model)}"></div>
+        <div class="appl-field"><div class="appl-field-label">Serial #</div><input placeholder="Serial number" value="${esc(a.serial)}"></div>
+        <div class="appl-field"><div class="appl-field-label">Purchased</div><input placeholder="MM/YYYY" value="${esc(a.purchased)}"></div>
+        <div class="appl-field"><div class="appl-field-label">Warranty expires</div><input placeholder="MM/YYYY" value="${esc(a.warrantyExp)}"></div>
+        <div class="appl-field"><div class="appl-field-label">Last serviced</div><input placeholder="MM/YYYY" value="${esc(a.lastService)}"></div>
+        <div class="appl-field" style="grid-column:span 2"><div class="appl-field-label">Notes</div><input placeholder="Any notes..." value="${esc(a.notes)}" style="width:100%"></div>
+      </div>`;
+
+    card.querySelector('.appl-name-input').addEventListener('input',e=>{a.name=e.target.value;save()});
+    card.querySelector('.del-btn').addEventListener('click',()=>{state.appliances.splice(i,1);save();renderAppliances();updateStats()});
+    const fields=['brand','model','serial','purchased','warrantyExp','lastService','notes'];
+    card.querySelectorAll('.appl-body input').forEach((inp,fi)=>{
+      inp.addEventListener('input',e=>{a[fields[fi]]=e.target.value;save()});
+    });
+    grid.appendChild(card);
+  });
+  updateStats();
+}
+
+function checkWarranty(exp){
+  if(!exp) return '';
+  const parts=exp.split('/');
+  if(parts.length!==2) return '';
+  const d=new Date(parseInt(parts[1]),parseInt(parts[0])-1,1);
+  return d>new Date()?'ok':'expired';
+}
+
+/* ── CONTACTS ── */
+function addContact(){
+  state.contacts.push({id:Date.now(),name:'',type:'Handyman',phone:'',email:'',company:'',notes:''});
+  save(); renderContacts();
+}
+
+const TYPE_COLORS={Plumber:'#E6F0FB:#0C447C',Electrician:'#FAEEDA:#633806',HVAC:'#EEEDFE:#3C3489',Roofer:'#FDEAEA:#8B2E2E',Landscaper:'#E8F5EF:#1A5C38','Pest Control':'#FAEEE3:#7A3A1A',Handyman:'#F1EFE8:#444441',Painter:'#FBEAF0:#72243E',Other:'#F4F3F0:#5C5B57'};
+
+function renderContacts(){
+  const list=document.getElementById('contactList');
+  list.innerHTML='';
+  state.contacts.forEach((c,i)=>{
+    const [bg,col]=(TYPE_COLORS[c.type]||TYPE_COLORS['Other']).split(':');
+    const card=document.createElement('div');
+    card.className='contact-card';
+    card.innerHTML=`
+      <div class="contact-head">
+        <div style="display:flex;align-items:center;gap:8px">
+          <input style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:var(--gray-800);font-family:'DM Sans',sans-serif" placeholder="Contact name..." value="${esc(c.name)}">
+          <span class="contact-type-pill" style="background:${bg};color:${col}">${c.type}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <select style="border:none;outline:none;background:transparent;font-size:12px;color:var(--gray-600);font-family:'DM Sans',sans-serif;cursor:pointer">
+            ${CONTACT_TYPES.map(t=>`<option ${t===c.type?'selected':''}>${t}</option>`).join('')}
+          </select>
+          <button class="del-btn">✕</button>
+        </div>
+      </div>
+      <div class="contact-body">
+        <div class="contact-cell"><div class="contact-field-label">Phone</div><input class="contact-input" placeholder="(555) 555-5555" value="${esc(c.phone)}"></div>
+        <div class="contact-cell"><div class="contact-field-label">Email</div><input class="contact-input" placeholder="email@example.com" value="${esc(c.email)}"></div>
+        <div class="contact-cell"><div class="contact-field-label">Company / Notes</div><input class="contact-input" placeholder="Company name, license #, notes..." value="${esc(c.notes)}"></div>
+      </div>`;
+
+    card.querySelector('input').addEventListener('input',e=>{c.name=e.target.value;save()});
+    card.querySelector('select').addEventListener('change',e=>{c.type=e.target.value;save();renderContacts()});
+    card.querySelector('.del-btn').addEventListener('click',()=>{state.contacts.splice(i,1);save();renderContacts();updateStats()});
+    const bodyInputs=card.querySelectorAll('.contact-input');
+    ['phone','email','notes'].forEach((f,fi)=>{
+      bodyInputs[fi].addEventListener('input',e=>{c[f]=e.target.value;save()});
+    });
+    list.appendChild(card);
+  });
+  updateStats();
+}
+
+/* ── PAINT ── */
+function addPaint(){
+  state.paint.push({id:Date.now(),room:'',color:'',finish:'',swatch:'#FFFFFF'});
+  save(); renderPaint();
+}
+function addMaterial(){
+  state.materials.push({id:Date.now(),item:'',spec:'',notes:''});
+  save(); renderPaint();
+}
+
+function renderPaint(){
+  const list=document.getElementById('paintList');
+  list.innerHTML='';
+  state.paint.forEach((p,i)=>{
+    const div=document.createElement('div');
+    div.className='paint-row';
+    div.innerHTML=`
+      <input class="ri" placeholder="Room name..." value="${esc(p.room)}">
+      <input class="ri" placeholder="Color name / code..." value="${esc(p.color)}">
+      <input class="ri" placeholder="Finish, sheen, notes..." value="${esc(p.finish)}">
+      <input type="color" class="swatch" value="${p.swatch||'#ffffff'}" title="Pick color">
+      <button class="del-btn">✕</button>`;
+    div.querySelectorAll('input.ri')[0].addEventListener('input',e=>{p.room=e.target.value;save()});
+    div.querySelectorAll('input.ri')[1].addEventListener('input',e=>{p.color=e.target.value;save()});
+    div.querySelectorAll('input.ri')[2].addEventListener('input',e=>{p.finish=e.target.value;save()});
+    div.querySelector('input[type=color]').addEventListener('input',e=>{p.swatch=e.target.value;save()});
+    div.querySelector('.del-btn').addEventListener('click',()=>{state.paint.splice(i,1);save();renderPaint()});
+    list.appendChild(div);
+  });
+
+  const mlist=document.getElementById('materialList');
+  mlist.innerHTML='';
+  state.materials.forEach((m,i)=>{
+    const div=document.createElement('div');
+    div.className='repair-row';
+    div.style.gridTemplateColumns='1fr 1fr 1fr 28px';
+    div.innerHTML=`
+      <input class="ri" placeholder="Item (e.g. Flooring)..." value="${esc(m.item)}">
+      <input class="ri" placeholder="Spec / SKU / color..." value="${esc(m.spec)}">
+      <input class="ri" placeholder="Notes, where purchased..." value="${esc(m.notes)}">
+      <button class="del-btn">✕</button>`;
+    div.querySelectorAll('input')[0].addEventListener('input',e=>{m.item=e.target.value;save()});
+    div.querySelectorAll('input')[1].addEventListener('input',e=>{m.spec=e.target.value;save()});
+    div.querySelectorAll('input')[2].addEventListener('input',e=>{m.notes=e.target.value;save()});
+    div.querySelector('.del-btn').addEventListener('click',()=>{state.materials.splice(i,1);save();renderPaint()});
+    mlist.appendChild(div);
+  });
+}
+
+/* ── STATS ── */
+function updateStats(){
+  const season=currentSeason==='monthly'?'spring':currentSeason;
+  const tasks=state.seasonal[currentSeason]||[];
+  const done=tasks.filter(t=>t.done).length;
+  document.getElementById('statSeason').textContent=tasks.length;
+  document.getElementById('statSeasonDone').textContent=`${done} of ${tasks.length} done`;
+
+  const open=state.repairs.filter(r=>r.status!=='Done').length;
+  document.getElementById('statRepairs').textContent=open;
+
+  document.getElementById('statAppl').textContent=state.appliances.length;
+  const activeWarr=state.appliances.filter(a=>checkWarranty(a.warrantyExp)==='ok').length;
+  document.getElementById('statWarranty').textContent=`${activeWarr} warranty active`;
+
+  document.getElementById('statContacts').textContent=state.contacts.length;
+}
+
+/* ── INIT ── */
+load();
+document.getElementById('homeAddr').textContent=state.addr||'Add your address ✎';
+loadPeople();
+renderSeasonal();
+updateStats();
+</script>
+</body>
+</html>

@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance Tracker — My Life Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple:       #5B3FA8;
+  --purple-mid:   #7B5FC8;
+  --purple-light: #EEEDFE;
+  --purple-soft:  #F4F2FF;
+  --green:        #2A6E4A;
+  --green-light:  #E8F5EF;
+  --green-mid:    #3B8B5A;
+  --amber:        #B06820;
+  --amber-light:  #FEF3E2;
+  --red:          #8B2E2E;
+  --red-light:    #FDEAEA;
+  --blue:         #1A4F8A;
+  --blue-light:   #E6F0FB;
+  --gray-50:      #FAFAF9;
+  --gray-100:     #F4F3F0;
+  --gray-200:     #E5E4DF;
+  --gray-300:     #CECDC8;
+  --gray-400:     #9B9A94;
+  --gray-600:     #5C5B57;
+  --gray-800:     #2C2C2A;
+  --white:        #FFFFFF;
+  --radius:       10px;
+  --radius-lg:    14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh}
+
+/* topbar */
+.topbar{background:var(--purple);padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
+.topbar-left .hub-label{font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);letter-spacing:0.08em;text-transform:uppercase}
+.topbar-left .page-title{font-size:18px;font-weight:600;color:#fff;letter-spacing:-0.01em}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.month-nav{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.12);border-radius:20px;padding:5px 14px}
+.month-nav button{background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:16px;line-height:1;padding:0 2px}
+.month-nav button:hover{color:#fff}
+.month-label{font-size:13px;font-weight:500;color:#fff;min-width:110px;text-align:center}
+.save-dot{font-size:11px;color:rgba(255,255,255,0.45);font-family:'DM Mono',monospace;transition:color 0.3s}
+.save-dot.saved{color:#6EE7A8}
+
+/* layout */
+.page{max-width:1120px;margin:0 auto;padding:22px 22px 48px}
+
+/* summary cards */
+.summary-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.sum-card{background:var(--white);border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:14px 16px}
+.sum-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:6px}
+.sum-value{font-size:24px;font-weight:600;letter-spacing:-0.02em;font-family:'DM Mono',monospace}
+.sum-value.income{color:var(--green)}
+.sum-value.expense{color:var(--red)}
+.sum-value.left{color:var(--purple)}
+.sum-value.saved{color:var(--blue)}
+.sum-sub{font-size:11px;color:var(--gray-400);margin-top:4px}
+.bar-wrap{height:4px;background:var(--gray-100);border-radius:2px;margin-top:8px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;transition:width 0.5s}
+
+/* tabs */
+.tabs{display:flex;gap:2px;background:var(--gray-100);border-radius:var(--radius);padding:3px;margin-bottom:16px;width:fit-content}
+.tab{padding:7px 18px;border-radius:8px;font-size:13px;font-weight:500;color:var(--gray-600);cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.tab.active{background:var(--white);color:var(--gray-800);box-shadow:0 0 0 0.5px var(--gray-200)}
+
+/* section cards */
+.section-card{background:var(--white);border:0.5px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:14px}
+.section-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid var(--gray-100)}
+.section-head-left{display:flex;align-items:center;gap:8px}
+.section-icon{font-size:15px}
+.section-title{font-size:13px;font-weight:600;color:var(--gray-800)}
+.section-total{font-size:12px;font-family:'DM Mono',monospace;color:var(--gray-600)}
+.add-btn{font-size:12px;font-weight:500;color:var(--purple);background:var(--purple-light);border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s}
+.add-btn:hover{background:#DDDAFC}
+
+/* table rows */
+.item-row{display:grid;align-items:center;padding:9px 16px;border-bottom:0.5px solid var(--gray-50);transition:background 0.1s}
+.item-row:last-child{border-bottom:none}
+.item-row:hover{background:var(--gray-50)}
+.item-name-input,.item-amount-input,.item-date-input,.item-cat-input{border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--gray-800);width:100%}
+.item-name-input::placeholder,.item-amount-input::placeholder{color:var(--gray-300);font-style:italic}
+.item-amount-input{font-family:'DM Mono',monospace;font-size:13px;text-align:right}
+.item-amount-input.income-amt{color:var(--green)}
+.item-amount-input.expense-amt{color:var(--red)}
+.delete-btn{background:none;border:none;cursor:pointer;color:var(--gray-300);font-size:14px;padding:0 2px;transition:color 0.15s;line-height:1}
+.delete-btn:hover{color:var(--red)}
+.paid-check{accent-color:var(--purple);width:14px;height:14px;cursor:pointer}
+.paid-label{font-size:11px;color:var(--gray-400)}
+.overdue-pill{font-size:10px;background:var(--red-light);color:var(--red);border-radius:4px;padding:2px 6px;font-weight:500;white-space:nowrap}
+.due-soon-pill{font-size:10px;background:var(--amber-light);color:var(--amber);border-radius:4px;padding:2px 6px;font-weight:500;white-space:nowrap}
+.cat-pill{font-size:10px;border-radius:4px;padding:2px 7px;font-weight:500}
+
+/* savings goal */
+.goal-row{padding:12px 16px;border-bottom:0.5px solid var(--gray-100)}
+.goal-row:last-child{border-bottom:none}
+.goal-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.goal-name-input{border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--gray-800);flex:1}
+.goal-amounts{display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:12px;color:var(--gray-600)}
+.goal-saved-input,.goal-target-input{border:none;outline:none;background:transparent;font-family:'DM Mono',monospace;font-size:12px;color:var(--gray-800);text-align:right;width:70px}
+.goal-bar-wrap{height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden}
+.goal-bar{height:100%;border-radius:3px;background:var(--purple);transition:width 0.4s}
+.goal-pct{font-size:10px;color:var(--gray-400);margin-top:3px;font-family:'DM Mono',monospace}
+
+/* net worth / notes */
+.note-area{width:100%;border:none;outline:none;resize:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--gray-800);padding:12px 16px;background:transparent;min-height:80px}
+.note-area::placeholder{color:var(--gray-400);font-style:italic}
+
+/* panel layout */
+.two-col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.three-col{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+
+/* wealth tab */
+.acct-row{display:grid;align-items:center;padding:10px 16px;border-bottom:0.5px solid var(--gray-50);gap:10px;transition:background 0.1s}
+.acct-row:last-child{border-bottom:none}
+.acct-row:hover{background:var(--gray-50)}
+.acct-type-pill{font-size:10px;font-weight:500;padding:3px 8px;border-radius:6px;white-space:nowrap;text-align:center}
+.type-401k{background:#E8F5EF;color:#1A5C38}
+.type-roth{background:#EAF3DE;color:#27500A}
+.type-invest{background:#E6F0FB;color:#0C447C}
+.type-hsa{background:#FAEEDA;color:#633806}
+.type-checking{background:#EEEDFE;color:#3C3489}
+.type-savings{background:#EEEDFE;color:#3C3489}
+.type-other{background:#F1EFE8;color:#5F5E5A}
+.wealth-change{font-size:11px;font-family:'DM Mono',monospace}
+.wealth-change.up{color:var(--green)}
+.wealth-change.down{color:var(--red)}
+.nw-bar-wrap{height:8px;background:var(--gray-100);border-radius:4px;margin-top:10px;overflow:hidden;display:grid;grid-template-columns:1fr}
+.nw-segment{height:100%;transition:width 0.5s}
+@media(max-width:700px){.two-col,.three-col,.summary-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="hub-label">My Life Hub</div>
+    <div class="page-title">Finance Tracker</div>
+  </div>
+  <div class="topbar-right">
+    <div class="month-nav">
+      <button onclick="changeMonth(-1)">&#8249;</button>
+      <span class="month-label" id="monthLabel"></span>
+      <button onclick="changeMonth(1)">&#8250;</button>
+    </div>
+    <span class="save-dot" id="saveDot">auto-saving</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Summary -->
+  <div class="summary-grid">
+    <div class="sum-card">
+      <div class="sum-label">Monthly income</div>
+      <div class="sum-value income" id="sumIncome">$0</div>
+      <div class="sum-sub">total expected in</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Total expenses</div>
+      <div class="sum-value expense" id="sumExpense">$0</div>
+      <div class="sum-sub">bills + subscriptions</div>
+      <div class="bar-wrap"><div class="bar-fill" id="expBar" style="width:0%;background:var(--red)"></div></div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Left over</div>
+      <div class="sum-value left" id="sumLeft">$0</div>
+      <div class="sum-sub">income minus expenses</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Saved toward goals</div>
+      <div class="sum-value saved" id="sumSaved">$0</div>
+      <div class="sum-sub">across all goals</div>
+      <div class="bar-wrap"><div class="bar-fill" id="goalBar" style="width:0%;background:var(--blue)"></div></div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Net worth</div>
+      <div class="sum-value" id="sumNetWorth" style="color:var(--green)">$0</div>
+      <div class="sum-sub">assets minus debts</div>
+      <div class="bar-wrap"><div class="bar-fill" id="nwBar" style="width:100%;background:var(--green)"></div></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('budget')">Budget</button>
+    <button class="tab" onclick="showTab('bills')">Bills</button>
+    <button class="tab" onclick="showTab('subs')">Subscriptions</button>
+    <button class="tab" onclick="showTab('goals')">Savings Goals</button>
+    <button class="tab" onclick="showTab('wealth')">Wealth & Accounts</button>
+    <button class="tab" onclick="showTab('notes')">Notes</button>
+  </div>
+
+  <!-- BUDGET TAB -->
+  <div id="tab-budget">
+    <div class="two-col">
+      <!-- Income -->
+      <div class="section-card">
+        <div class="section-head">
+          <div class="section-head-left">
+            <span class="section-icon">💵</span>
+            <span class="section-title">Income</span>
+            <span class="section-total" id="incomeTotal"></span>
+          </div>
+          <button class="add-btn" onclick="addRow('income')">+ Add</button>
+        </div>
+        <div id="incomeList"></div>
+      </div>
+      <!-- Expenses -->
+      <div class="section-card">
+        <div class="section-head">
+          <div class="section-head-left">
+            <span class="section-icon">💸</span>
+            <span class="section-title">Monthly Expenses</span>
+            <span class="section-total" id="expenseTotal"></span>
+          </div>
+          <button class="add-btn" onclick="addRow('expense')">+ Add</button>
+        </div>
+        <div id="expenseList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BILLS TAB -->
+  <div id="tab-bills" style="display:none">
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-left">
+          <span class="section-icon">🔔</span>
+          <span class="section-title">Bills Due This Month</span>
+          <span class="section-total" id="billsTotal"></span>
+        </div>
+        <button class="add-btn" onclick="addBill()">+ Add Bill</button>
+      </div>
+      <div id="billsList"></div>
+    </div>
+  </div>
+
+  <!-- SUBSCRIPTIONS TAB -->
+  <div id="tab-subs" style="display:none">
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-left">
+          <span class="section-icon">🔁</span>
+          <span class="section-title">Subscriptions</span>
+          <span class="section-total" id="subsTotal"></span>
+        </div>
+        <button class="add-btn" onclick="addSub()">+ Add</button>
+      </div>
+      <div id="subsList"></div>
+    </div>
+    <div style="font-size:12px;color:var(--gray-400);padding:6px 2px;font-style:italic">Tip: Review quarterly and cancel anything unused.</div>
+  </div>
+
+  <!-- SAVINGS GOALS TAB -->
+  <div id="tab-goals" style="display:none">
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-left">
+          <span class="section-icon">🎯</span>
+          <span class="section-title">Savings Goals</span>
+        </div>
+        <button class="add-btn" onclick="addGoal()">+ Add Goal</button>
+      </div>
+      <div id="goalsList"></div>
+    </div>
+  </div>
+
+  <!-- WEALTH & ACCOUNTS TAB -->
+  <div id="tab-wealth" style="display:none">
+    <div class="two-col" style="margin-bottom:14px">
+      <!-- Retirement -->
+      <div class="section-card">
+        <div class="section-head">
+          <div class="section-head-left">
+            <span class="section-icon">🏦</span>
+            <span class="section-title">Retirement Accounts</span>
+            <span class="section-total" id="retirementTotal"></span>
+          </div>
+          <button class="add-btn" onclick="addAccount('retirement')">+ Add</button>
+        </div>
+        <div id="retirementList"></div>
+      </div>
+      <!-- Investments -->
+      <div class="section-card">
+        <div class="section-head">
+          <div class="section-head-left">
+            <span class="section-icon">📈</span>
+            <span class="section-title">Investments & Brokerage</span>
+            <span class="section-total" id="investTotal"></span>
+          </div>
+          <button class="add-btn" onclick="addAccount('invest')">+ Add</button>
+        </div>
+        <div id="investList"></div>
+      </div>
+    </div>
+    <div class="two-col" style="margin-bottom:14px">
+      <!-- Bank Accounts -->
+      <div class="section-card">
+        <div class="section-head">
+          <div class="section-head-left">
+            <span class="section-icon">🏧</span>
+            <span class="section-title">Bank Accounts</span>
+            <span class="section-total" id="bankTotal"></span>
+          </div>
+          <button class="add-btn" onclick="addAccount('bank')">+ Add</button>
+        </div>
+        <div id="bankList"></div>
+      </div>
+      <!-- Debts -->
+      <div class="section-card">
+        <div class="section-head">
+          <div class="section-head-left">
+            <span class="section-icon">💳</span>
+            <span class="section-title">Debts & Liabilities</span>
+            <span class="section-total" id="debtTotal"></span>
+          </div>
+          <button class="add-btn" onclick="addAccount('debt')">+ Add</button>
+        </div>
+        <div id="debtList"></div>
+      </div>
+    </div>
+    <!-- Net Worth Summary -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-left">
+          <span class="section-icon">📊</span>
+          <span class="section-title">Net Worth Snapshot</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-bottom:0.5px solid var(--gray-100)">
+        <div style="padding:16px;border-right:0.5px solid var(--gray-100)">
+          <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:6px">Total Assets</div>
+          <div style="font-size:22px;font-weight:600;font-family:'DM Mono',monospace;color:var(--green)" id="nwAssets">$0</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:3px">retirement + investments + bank</div>
+        </div>
+        <div style="padding:16px;border-right:0.5px solid var(--gray-100)">
+          <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:6px">Total Debts</div>
+          <div style="font-size:22px;font-weight:600;font-family:'DM Mono',monospace;color:var(--red)" id="nwDebts">$0</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:3px">loans, credit cards, mortgage</div>
+        </div>
+        <div style="padding:16px">
+          <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:6px">Net Worth</div>
+          <div style="font-size:22px;font-weight:600;font-family:'DM Mono',monospace;" id="nwTotal">$0</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:3px">assets minus debts</div>
+        </div>
+      </div>
+      <div style="padding:12px 16px">
+        <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px">Asset breakdown</div>
+        <div style="display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px" id="nwBreakdownBar"></div>
+        <div style="display:flex;gap:16px;margin-top:8px;flex-wrap:wrap" id="nwLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES TAB -->
+  <div id="tab-notes" style="display:none">
+    <div class="two-col">
+      <div class="section-card">
+        <div class="section-head"><div class="section-head-left"><span class="section-icon">📝</span><span class="section-title">Monthly Notes</span></div></div>
+        <textarea class="note-area" id="monthNotes" placeholder="Anything notable this month — unexpected expenses, financial wins, decisions made..."></textarea>
+      </div>
+      <div class="section-card">
+        <div class="section-head"><div class="section-head-left"><span class="section-icon">📌</span><span class="section-title">Financial Reminders</span></div></div>
+        <textarea class="note-area" id="finReminders" placeholder="e.g. Call insurance to shop rates, set up auto-pay for mortgage, check credit score..."></textarea>
+      </div>
+    </div>
+    <div class="section-card" style="margin-top:0">
+      <div class="section-head"><div class="section-head-left"><span class="section-icon">🏦</span><span class="section-title">Account Numbers &amp; Contacts</span></div></div>
+      <textarea class="note-area" id="accountNotes" placeholder="Bank: Chase checking #xxxx&#10;Mortgage lender: ABC Bank · 1-800-xxx · Loan #xxxxx&#10;Insurance: State Farm · Agent: John · Policy #xxxxx" style="min-height:120px"></textarea>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'mylifehub_finance_v1';
+
+const CATS = {
+  income:  [{label:'Salary',color:'#27500A',bg:'#EAF3DE'},{label:'Side hustle',color:'#0C447C',bg:'#E6F0FB'},{label:'Other',color:'#5F5E5A',bg:'#F1EFE8'}],
+  expense: [{label:'Housing',color:'#3C3489',bg:'#EEEDFE'},{label:'Food',color:'#633806',bg:'#FAEEDA'},{label:'Transport',color:'#0C447C',bg:'#E6F0FB'},{label:'Health',color:'#712B13',bg:'#FAECE7'},{label:'Personal',color:'#993556',bg:'#FBEAF0'},{label:'Other',color:'#5F5E5A',bg:'#F1EFE8'}],
+};
+
+let currentMonth;
+let state;
+
+function monthKey(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}` }
+function monthDisplay(d) { return d.toLocaleDateString('en-US',{month:'long',year:'numeric'}) }
+
+function loadState() {
+  try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {} } catch(e) { state = {} }
+  if (!state.months) state.months = {};
+  if (!state.goals) state.goals = [];
+  if (!state.subs) state.subs = [];
+  if (!state.accounts) state.accounts = { retirement:[], invest:[], bank:[], debt:[] };
+  if (!state.accounts.retirement) state.accounts.retirement = [];
+  if (!state.accounts.invest) state.accounts.invest = [];
+  if (!state.accounts.bank) state.accounts.bank = [];
+  if (!state.accounts.debt) state.accounts.debt = [];
+  if (!state.accountNotes) state.accountNotes = '';
+  if (!state.finReminders) state.finReminders = '';
+}
+
+function getMonth(key) {
+  if (!state.months[key]) state.months[key] = { income:[], expense:[], bills:[], notes:'' };
+  return state.months[key];
+}
+
+let saveTimer;
+function save() {
+  clearTimeout(saveTimer);
+  document.getElementById('saveDot').textContent = 'saving...';
+  document.getElementById('saveDot').classList.remove('saved');
+  saveTimer = setTimeout(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    document.getElementById('saveDot').textContent = 'saved';
+    document.getElementById('saveDot').classList.add('saved');
+    setTimeout(() => { document.getElementById('saveDot').textContent = 'auto-saving'; }, 1800);
+  }, 500);
+}
+
+function fmt(n) {
+  const v = parseFloat(n)||0;
+  return '$'+v.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
+}
+function parseAmt(s) { return parseFloat(String(s).replace(/[$,]/g,''))||0; }
+
+function changeMonth(dir) {
+  currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth()+dir, 1);
+  document.getElementById('monthLabel').textContent = monthDisplay(currentMonth);
+  render();
+}
+
+/* ── BUDGET ── */
+function addRow(type, data={}) {
+  const m = getMonth(monthKey(currentMonth));
+  const row = {id:Date.now()+Math.random(), name:data.name||'', amount:data.amount||'', cat:data.cat||''};
+  m[type].push(row);
+  save();
+  renderBudget();
+}
+
+function renderBudget() {
+  const m = getMonth(monthKey(currentMonth));
+  ['income','expense'].forEach(type => {
+    const list = document.getElementById(type+'List');
+    list.innerHTML='';
+    const cols = type==='income' ? '1fr 90px 60px 26px' : '1fr 80px 100px 26px';
+    m[type].forEach((row,i) => {
+      const div = document.createElement('div');
+      div.className='item-row';
+      div.style.gridTemplateColumns=cols;
+      const cats = CATS[type];
+      const catMatch = cats.find(c=>c.label===row.cat)||cats[cats.length-1];
+
+      div.innerHTML = `
+        <input class="item-name-input" placeholder="Description..." value="${esc(row.name)}">
+        <input class="item-amount-input ${type}-amt" placeholder="0.00" value="${esc(row.amount)}" style="text-align:right">
+        ${type==='income'
+          ? `<select style="border:none;outline:none;background:transparent;font-size:11px;color:var(--gray-600);font-family:'DM Sans',sans-serif;cursor:pointer">${cats.map(c=>`<option ${c.label===row.cat?'selected':''}>${c.label}</option>`).join('')}</select>`
+          : `<select style="border:none;outline:none;background:transparent;font-size:11px;color:var(--gray-600);font-family:'DM Sans',sans-serif;cursor:pointer">${cats.map(c=>`<option ${c.label===row.cat?'selected':''}>${c.label}</option>`).join('')}</select>`
+        }
+        <button class="delete-btn">✕</button>`;
+
+      div.querySelector('.item-name-input').addEventListener('input',e=>{ row.name=e.target.value; save(); updateSummary(); });
+      div.querySelector('.item-amount-input').addEventListener('input',e=>{ row.amount=e.target.value; save(); updateSummary(); renderBudget(); });
+      div.querySelector('select').addEventListener('change',e=>{ row.cat=e.target.value; save(); });
+      div.querySelector('.delete-btn').addEventListener('click',()=>{ m[type].splice(i,1); save(); renderBudget(); updateSummary(); });
+      list.appendChild(div);
+    });
+
+    const total = m[type].reduce((s,r)=>s+parseAmt(r.amount),0);
+    document.getElementById(type+'Total').textContent = total ? fmt(total) : '';
+  });
+  updateSummary();
+}
+
+/* ── BILLS ── */
+function addBill() {
+  const m = getMonth(monthKey(currentMonth));
+  m.bills.push({id:Date.now()+Math.random(), name:'', amount:'', dueDay:'', paid:false});
+  save(); renderBills();
+}
+
+function renderBills() {
+  const m = getMonth(monthKey(currentMonth));
+  const list = document.getElementById('billsList');
+  list.innerHTML='';
+  const today = new Date();
+
+  m.bills.forEach((bill,i) => {
+    const due = bill.dueDay ? new Date(currentMonth.getFullYear(), currentMonth.getMonth(), parseInt(bill.dueDay)) : null;
+    const daysUntil = due ? Math.ceil((due-today)/(1000*60*60*24)) : null;
+    let pill='';
+    if(!bill.paid && daysUntil!==null) {
+      if(daysUntil<0) pill=`<span class="overdue-pill">Overdue</span>`;
+      else if(daysUntil<=5) pill=`<span class="due-soon-pill">Due in ${daysUntil}d</span>`;
+    }
+
+    const div = document.createElement('div');
+    div.className='item-row';
+    div.style.gridTemplateColumns='1fr 90px 70px auto 26px';
+    div.style.gap='8px';
+    div.innerHTML=`
+      <input class="item-name-input" placeholder="Bill name..." value="${esc(bill.name)}">
+      <input class="item-amount-input expense-amt" placeholder="0.00" value="${esc(bill.amount)}">
+      <input class="item-date-input" placeholder="Day (1-31)" value="${esc(bill.dueDay)}" style="font-size:12px;color:var(--gray-600);border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;width:100%">
+      <div style="display:flex;align-items:center;gap:5px;white-space:nowrap">
+        ${pill}
+        <input type="checkbox" class="paid-check" ${bill.paid?'checked':''}>
+        <span class="paid-label">${bill.paid?'paid':'unpaid'}</span>
+      </div>
+      <button class="delete-btn">✕</button>`;
+
+    div.querySelector('.item-name-input').addEventListener('input',e=>{bill.name=e.target.value;save();});
+    div.querySelector('.item-amount-input').addEventListener('input',e=>{bill.amount=e.target.value;save();renderBills();updateSummary();});
+    div.querySelector('.item-date-input').addEventListener('input',e=>{bill.dueDay=e.target.value;save();renderBills();});
+    div.querySelector('.paid-check').addEventListener('change',e=>{bill.paid=e.target.checked;save();renderBills();});
+    div.querySelector('.delete-btn').addEventListener('click',()=>{m.bills.splice(i,1);save();renderBills();updateSummary();});
+    list.appendChild(div);
+  });
+
+  const total = m.bills.reduce((s,b)=>s+parseAmt(b.amount),0);
+  document.getElementById('billsTotal').textContent = total ? fmt(total) : '';
+  updateSummary();
+}
+
+/* ── SUBSCRIPTIONS ── */
+function addSub() {
+  state.subs.push({id:Date.now()+Math.random(), name:'', amount:'', cycle:'Monthly', active:true});
+  save(); renderSubs();
+}
+
+function renderSubs() {
+  const list = document.getElementById('subsList');
+  list.innerHTML='';
+  state.subs.forEach((sub,i) => {
+    const div = document.createElement('div');
+    div.className='item-row';
+    div.style.gridTemplateColumns='1fr 90px 90px auto 26px';
+    div.style.gap='8px';
+    div.innerHTML=`
+      <input class="item-name-input" placeholder="Service name..." value="${esc(sub.name)}">
+      <input class="item-amount-input expense-amt" placeholder="0.00" value="${esc(sub.amount)}">
+      <select style="border:none;outline:none;background:transparent;font-size:12px;color:var(--gray-600);font-family:'DM Sans',sans-serif;cursor:pointer">
+        ${['Monthly','Annual','Quarterly','Weekly'].map(c=>`<option ${c===sub.cycle?'selected':''}>${c}</option>`).join('')}
+      </select>
+      <div style="display:flex;align-items:center;gap:5px">
+        <input type="checkbox" class="paid-check" ${sub.active?'checked':''}>
+        <span class="paid-label" style="font-size:11px;color:var(--gray-400)">${sub.active?'active':'paused'}</span>
+      </div>
+      <button class="delete-btn">✕</button>`;
+
+    div.querySelector('.item-name-input').addEventListener('input',e=>{sub.name=e.target.value;save();});
+    div.querySelector('.item-amount-input').addEventListener('input',e=>{sub.amount=e.target.value;save();renderSubs();updateSummary();});
+    div.querySelector('select').addEventListener('change',e=>{sub.cycle=e.target.value;save();renderSubs();});
+    div.querySelector('.paid-check').addEventListener('change',e=>{sub.active=e.target.checked;save();renderSubs();});
+    div.querySelector('.delete-btn').addEventListener('click',()=>{state.subs.splice(i,1);save();renderSubs();updateSummary();});
+    list.appendChild(div);
+  });
+
+  const monthlyTotal = state.subs.filter(s=>s.active).reduce((sum,s)=>{
+    const a = parseAmt(s.amount);
+    if(s.cycle==='Annual') return sum+a/12;
+    if(s.cycle==='Quarterly') return sum+a/3;
+    if(s.cycle==='Weekly') return sum+a*4.33;
+    return sum+a;
+  },0);
+  document.getElementById('subsTotal').textContent = monthlyTotal ? fmt(monthlyTotal)+'/mo' : '';
+  updateSummary();
+}
+
+/* ── GOALS ── */
+function addGoal() {
+  state.goals.push({id:Date.now()+Math.random(), name:'', saved:'', target:''});
+  save(); renderGoals();
+}
+
+function renderGoals() {
+  const list = document.getElementById('goalsList');
+  list.innerHTML='';
+  let totalSaved=0, totalTarget=0;
+  state.goals.forEach((goal,i) => {
+    const saved = parseAmt(goal.saved);
+    const target = parseAmt(goal.target);
+    const pct = target>0 ? Math.min(100,Math.round(saved/target*100)) : 0;
+    totalSaved+=saved; totalTarget+=target;
+
+    const div = document.createElement('div');
+    div.className='goal-row';
+    div.innerHTML=`
+      <div class="goal-top">
+        <input class="goal-name-input" placeholder="Goal name (e.g. Emergency fund)..." value="${esc(goal.name)}">
+        <div style="display:flex;align-items:center;gap:4px">
+          <div class="goal-amounts">
+            $<input class="goal-saved-input" placeholder="0" value="${esc(goal.saved)}"> of $<input class="goal-target-input" placeholder="0" value="${esc(goal.target)}">
+          </div>
+          <button class="delete-btn" style="margin-left:8px">✕</button>
+        </div>
+      </div>
+      <div class="goal-bar-wrap"><div class="goal-bar" style="width:${pct}%;background:${pct>=100?'var(--green)':'var(--purple)'}"></div></div>
+      <div class="goal-pct">${pct}% complete${pct>=100?' — Goal reached! 🎉':''}</div>`;
+
+    div.querySelector('.goal-name-input').addEventListener('input',e=>{goal.name=e.target.value;save();});
+    div.querySelector('.goal-saved-input').addEventListener('input',e=>{goal.saved=e.target.value;save();renderGoals();updateSummary();});
+    div.querySelector('.goal-target-input').addEventListener('input',e=>{goal.target=e.target.value;save();renderGoals();});
+    div.querySelector('.delete-btn').addEventListener('click',()=>{state.goals.splice(i,1);save();renderGoals();updateSummary();});
+    list.appendChild(div);
+  });
+
+  document.getElementById('sumSaved').textContent = fmt(totalSaved);
+  const goalPct = totalTarget>0 ? Math.min(100,Math.round(totalSaved/totalTarget*100)) : 0;
+  document.getElementById('goalBar').style.width = goalPct+'%';
+}
+
+/* ── NOTES ── */
+function renderNotes() {
+  document.getElementById('monthNotes').value = getMonth(monthKey(currentMonth)).notes||'';
+  document.getElementById('finReminders').value = state.finReminders||'';
+  document.getElementById('accountNotes').value = state.accountNotes||'';
+}
+
+/* ── SUMMARY ── */
+function updateSummary() {
+  const m = getMonth(monthKey(currentMonth));
+  const income = m.income.reduce((s,r)=>s+parseAmt(r.amount),0);
+  const budgetExp = m.expense.reduce((s,r)=>s+parseAmt(r.amount),0);
+  const bills = m.bills.reduce((s,b)=>s+parseAmt(b.amount),0);
+  const subsMonthly = state.subs.filter(s=>s.active).reduce((sum,s)=>{
+    const a=parseAmt(s.amount);
+    if(s.cycle==='Annual') return sum+a/12;
+    if(s.cycle==='Quarterly') return sum+a/3;
+    if(s.cycle==='Weekly') return sum+a*4.33;
+    return sum+a;
+  },0);
+  const totalExp = budgetExp+bills+subsMonthly;
+  const left = income-totalExp;
+
+  document.getElementById('sumIncome').textContent = fmt(income);
+  document.getElementById('sumExpense').textContent = fmt(totalExp);
+  document.getElementById('sumLeft').textContent = fmt(left);
+  document.getElementById('sumLeft').style.color = left>=0?'var(--purple)':'var(--red)';
+  const expPct = income>0 ? Math.min(100,Math.round(totalExp/income*100)) : 0;
+  document.getElementById('expBar').style.width = expPct+'%';
+}
+
+/* ── WEALTH & ACCOUNTS ── */
+const ACCT_TYPES = {
+  retirement: [{label:'401(k)',cls:'type-401k'},{label:'Roth IRA',cls:'type-roth'},{label:'Traditional IRA',cls:'type-roth'},{label:'403(b)',cls:'type-401k'},{label:'Pension',cls:'type-401k'},{label:'HSA',cls:'type-hsa'}],
+  invest:     [{label:'Brokerage',cls:'type-invest'},{label:'Stocks',cls:'type-invest'},{label:'ETFs',cls:'type-invest'},{label:'Crypto',cls:'type-other'},{label:'Real Estate',cls:'type-other'},{label:'Other',cls:'type-other'}],
+  bank:       [{label:'Checking',cls:'type-checking'},{label:'Savings',cls:'type-savings'},{label:'Money Market',cls:'type-savings'},{label:'CD',cls:'type-savings'},{label:'Other',cls:'type-other'}],
+  debt:       [{label:'Mortgage',cls:'type-other'},{label:'Auto loan',cls:'type-other'},{label:'Student loan',cls:'type-other'},{label:'Credit card',cls:'type-other'},{label:'Personal loan',cls:'type-other'},{label:'Other',cls:'type-other'}],
+};
+
+function addAccount(section) {
+  state.accounts[section].push({id:Date.now()+Math.random(), name:'', type: ACCT_TYPES[section][0].label, balance:'', lastUpdated:''});
+  save(); renderWealth();
+}
+
+function renderAccountSection(section, listId, totalId) {
+  const list = document.getElementById(listId);
+  list.innerHTML='';
+  const types = ACCT_TYPES[section];
+  const isDebt = section==='debt';
+
+  state.accounts[section].forEach((acct,i) => {
+    const typeObj = types.find(t=>t.label===acct.type)||types[0];
+    const div = document.createElement('div');
+    div.className='acct-row';
+    div.style.gridTemplateColumns='1fr 110px 100px 90px 26px';
+    div.innerHTML=`
+      <input class="item-name-input" placeholder="Account name / institution..." value="${esc(acct.name)}">
+      <select style="border:none;outline:none;background:transparent;font-size:11px;color:var(--gray-600);font-family:'DM Sans',sans-serif;cursor:pointer;width:100%">
+        ${types.map(t=>`<option ${t.label===acct.type?'selected':''}>${t.label}</option>`).join('')}
+      </select>
+      <input class="item-amount-input" placeholder="Balance" value="${esc(acct.balance)}"
+        style="text-align:right;color:${isDebt?'var(--red)':'var(--green)'}">
+      <input class="item-date-input" placeholder="Updated..." value="${esc(acct.lastUpdated)}"
+        style="font-size:11px;color:var(--gray-400);border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;width:100%;text-align:right">
+      <button class="delete-btn">✕</button>`;
+
+    div.querySelector('.item-name-input').addEventListener('input',e=>{acct.name=e.target.value;save();});
+    div.querySelector('select').addEventListener('change',e=>{acct.type=e.target.value;save();renderWealth();});
+    div.querySelector('.item-amount-input').addEventListener('input',e=>{acct.balance=e.target.value;save();renderWealth();updateNetWorthSummary();});
+    div.querySelector('.item-date-input').addEventListener('input',e=>{acct.lastUpdated=e.target.value;save();});
+    div.querySelector('.delete-btn').addEventListener('click',()=>{state.accounts[section].splice(i,1);save();renderWealth();});
+    list.appendChild(div);
+  });
+
+  const total = state.accounts[section].reduce((s,a)=>s+parseAmt(a.balance),0);
+  document.getElementById(totalId).textContent = total ? fmt(total) : '';
+  return total;
+}
+
+function updateNetWorthSummary() {
+  const retTotal  = state.accounts.retirement.reduce((s,a)=>s+parseAmt(a.balance),0);
+  const invTotal  = state.accounts.invest.reduce((s,a)=>s+parseAmt(a.balance),0);
+  const bankTotal = state.accounts.bank.reduce((s,a)=>s+parseAmt(a.balance),0);
+  const debtTotal = state.accounts.debt.reduce((s,a)=>s+parseAmt(a.balance),0);
+  const assets    = retTotal+invTotal+bankTotal;
+  const netWorth  = assets-debtTotal;
+
+  document.getElementById('nwAssets').textContent = fmt(assets);
+  document.getElementById('nwDebts').textContent  = fmt(debtTotal);
+  const nwEl = document.getElementById('nwTotal');
+  nwEl.textContent = fmt(netWorth);
+  nwEl.style.color = netWorth>=0?'var(--green)':'var(--red)';
+
+  // top summary card
+  document.getElementById('sumNetWorth').textContent = fmt(netWorth);
+  document.getElementById('sumNetWorth').style.color = netWorth>=0?'var(--green)':'var(--red)';
+
+  // breakdown bar
+  const bar = document.getElementById('nwBreakdownBar');
+  const legend = document.getElementById('nwLegend');
+  bar.innerHTML=''; legend.innerHTML='';
+  if(assets>0) {
+    const segments = [
+      {label:'Retirement',val:retTotal,color:'#1A6B5A'},
+      {label:'Investments',val:invTotal,color:'#1A4F8A'},
+      {label:'Bank',val:bankTotal,color:'#5B3FA8'},
+    ].filter(s=>s.val>0);
+    segments.forEach(s=>{
+      const pct = Math.round(s.val/assets*100);
+      bar.innerHTML+=`<div style="width:${pct}%;background:${s.color};border-radius:0"></div>`;
+      legend.innerHTML+=`<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray-600)"><span style="width:10px;height:10px;border-radius:2px;background:${s.color};display:inline-block"></span>${s.label}: ${fmt(s.val)} (${pct}%)</div>`;
+    });
+  }
+}
+
+function renderWealth() {
+  renderAccountSection('retirement','retirementList','retirementTotal');
+  renderAccountSection('invest','investList','investTotal');
+  renderAccountSection('bank','bankList','bankTotal');
+  renderAccountSection('debt','debtList','debtTotal');
+  updateNetWorthSummary();
+}
+
+/* ── TABS ── */
+function showTab(id) {
+  ['budget','bills','subs','goals','wealth','notes'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===id?'block':'none';
+  });
+  document.querySelectorAll('.tab').forEach((btn,i)=>{
+    btn.classList.toggle('active',['budget','bills','subs','goals','wealth','notes'][i]===id);
+  });
+  if(id==='bills') renderBills();
+  if(id==='subs') renderSubs();
+  if(id==='goals') renderGoals();
+  if(id==='wealth') renderWealth();
+  if(id==='notes') renderNotes();
+}
+
+function esc(s){ return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;') }
+
+function render() {
+  renderBudget();
+  renderBills();
+  renderSubs();
+  renderGoals();
+  renderWealth();
+  renderNotes();
+  updateSummary();
+}
+
+/* ── WIRE UP NOTES ── */
+function wireNotes() {
+  document.getElementById('monthNotes').addEventListener('input', e=>{
+    getMonth(monthKey(currentMonth)).notes = e.target.value; save();
+  });
+  document.getElementById('finReminders').addEventListener('input',e=>{ state.finReminders=e.target.value; save(); });
+  document.getElementById('accountNotes').addEventListener('input',e=>{ state.accountNotes=e.target.value; save(); });
+}
+
+/* ── SEED DEFAULTS if empty ── */
+function seedDefaults() {
+  const mk = monthKey(currentMonth);
+  if(state.months[mk]) return;
+  const m = getMonth(mk);
+  m.income = [
+    {id:1,name:'Salary / paycheck',amount:'',cat:'Salary'},
+    {id:2,name:'Side income',amount:'',cat:'Side hustle'},
+  ];
+  m.expense = [
+    {id:3,name:'Rent / mortgage',amount:'',cat:'Housing'},
+    {id:4,name:'Groceries',amount:'',cat:'Food'},
+    {id:5,name:'Gas / transportation',amount:'',cat:'Transport'},
+    {id:6,name:'Utilities',amount:'',cat:'Housing'},
+    {id:7,name:'Phone bill',amount:'',cat:'Personal'},
+  ];
+  m.bills = [
+    {id:8,name:'Electric',amount:'',dueDay:'15',paid:false},
+    {id:9,name:'Internet',amount:'',dueDay:'20',paid:false},
+    {id:10,name:'Car insurance',amount:'',dueDay:'1',paid:false},
+  ];
+  if(!state.subs.length) {
+    state.subs = [
+      {id:11,name:'Netflix',amount:'',cycle:'Monthly',active:true},
+      {id:12,name:'Spotify',amount:'',cycle:'Monthly',active:true},
+      {id:13,name:'iCloud / Google One',amount:'',cycle:'Monthly',active:true},
+    ];
+  }
+  if(!state.goals.length) {
+    state.goals = [
+      {id:14,name:'Emergency fund (3-6 months)',saved:'',target:''},
+      {id:15,name:'Home down payment',saved:'',target:''},
+      {id:16,name:'Moving costs',saved:'',target:''},
+    ];
+  }
+  if(!state.accounts.retirement.length) {
+    state.accounts.retirement = [
+      {id:20,name:'',type:'401(k)',balance:'',lastUpdated:''},
+      {id:21,name:'',type:'Roth IRA',balance:'',lastUpdated:''},
+    ];
+  }
+  if(!state.accounts.bank.length) {
+    state.accounts.bank = [
+      {id:22,name:'',type:'Checking',balance:'',lastUpdated:''},
+      {id:23,name:'',type:'Savings',balance:'',lastUpdated:''},
+    ];
+  }
+}
+
+loadState();
+currentMonth = new Date();
+currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+document.getElementById('monthLabel').textContent = monthDisplay(currentMonth);
+seedDefaults();
+render();
+wireNotes();
+</script>
+</body>
+</html>
